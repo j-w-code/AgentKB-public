@@ -6,25 +6,30 @@
 
 ## Current Status
 
-**Stage:** Pre-seed / Proof of concept complete
+**Stage:** Pre-seed / MVP
 
-A working implementation exists at personal scale, validating core patterns:
-- Manifest-first traversal
-- Claim typing and policy enforcement
-- Integrity verification
-- Closed-loop governance (error → rule)
+Working CLI implementation:
+- Output Gate (secrets/PII blocking)
+- RBAC with role-based sensitivity ceilings
+- Discovery scan for PII/secret patterns
+- Closed-loop error logging
+- REST API server (FastAPI)
+- MCP server for tool integration
+
+**Validation:** NIST AI RMF 1.0, OWASP Agentic Top 10 2026
 
 ---
 
-## Phase 1: CLI + Local (MVP)
+## Phase 1: CLI + Local (MVP) — ✅ Complete
 
-**Focus:** Extract patterns into reusable CLI tool
-
-- Local-first (Python + SQLite)
-- Governance templates (standard, enterprise, minimal)
-- Manifest auto-generation
-- Policy enforcement at retrieval
-- Audit logging
+**Delivered:**
+- `agentkb gate` — Output Gate for draft screening
+- `agentkb scan` — PII/secret discovery
+- `agentkb chat` — Gated LLM conversation
+- `agentkb doctor` — Preflight diagnostics
+- RBAC with four default roles
+- REST API + MCP server
+- CI pipeline (tests, lint, security scan)
 
 **Target:** Developers and AI-first professionals
 
@@ -72,4 +77,4 @@ A working implementation exists at personal scale, validating core patterns:
 
 ---
 
-*© 2025 Jeffrey Wiley. All rights reserved.*
+*© 2025-2026 Jeffrey Wiley. All rights reserved.*

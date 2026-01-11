@@ -104,18 +104,19 @@ Agent Error → Log → Pattern Detection → Rule Generation → Governance Upd
 
 ---
 
-## Proof of Concept
+## Current Implementation
 
-A working implementation exists at personal scale:
-- ~10 weeks development
-- Thousands of documents under governance
-- Error detection and rule generation demonstrated
-- Patterns validated through iteration
+A working MVP exists with:
+- **Output Gate** — Blocks secrets and PII at output time (access ≠ disclosure)
+- **RBAC** — Role-based access with sensitivity ceilings
+- **Discovery scan** — PII/secret pattern detection across corpus
+- **Closed-loop logging** — Blocked outputs feed error event schema
+- **Replay harness** — Deterministic regression tests from historical failures
 
-The proof of concept demonstrates that governance-first architecture works. AgentKB generalizes these patterns for broader adoption.
+**Framework alignment:** Architecture independently derived, later validated against NIST AI RMF 1.0 (GOVERN, MAP, MEASURE) and OWASP Agentic Security Initiative 2026 (8/10 categories covered).
 
 ---
 
 *For detailed specifications, contact: jeffreyjaywork@gmail.com*
 
-*© 2025 Jeffrey Wiley. All rights reserved.*
+*© 2025-2026 Jeffrey Wiley. All rights reserved.*

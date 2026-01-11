@@ -4,6 +4,8 @@
 
 **Governance-first knowledge infrastructure for AI agents.**
 
+🎬 **[Watch the Demo](https://youtu.be/69m-_s-wf8A)** (1:24) — See the Output Gate block secrets and PII in real-time.
+
 ---
 
 ## The Problem
@@ -67,9 +69,10 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for conceptual details.
 
 ## Status
 
-**Stage:** Pre-seed / Proof of concept  
-**Proof of concept:** Working implementation at personal scale (~10 weeks development)  
-**Next:** Generalize patterns into reusable framework
+**Stage:** Pre-seed / MVP  
+**Current:** Working CLI with Output Gate, RBAC, discovery scan, and closed-loop error logging  
+**Validation:** Architecture aligns with NIST AI RMF 1.0 and OWASP Agentic Security Initiative 2026  
+**Next:** API layer, SDK, enterprise pilot
 
 ---
 
@@ -92,4 +95,4 @@ The governance gap is the bottleneck for enterprise AI adoption.
 
 ---
 
-*© 2025 Jeffrey Wiley. All rights reserved.*
+*© 2025-2026 Jeffrey Wiley. All rights reserved.*
