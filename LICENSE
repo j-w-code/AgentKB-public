@@ -1,0 +1,85 @@
+AgentKB Source-Available License
+Version 1.0, January 2026
+
+Copyright (c) 2026 Jeffrey Wiley
+
+================================================================================
+TERMS AND CONDITIONS
+================================================================================
+
+1. DEFINITIONS
+
+"Software" means the AgentKB source code, documentation, and associated files
+in this repository.
+
+"Production Use" means any use of the Software to provide services, process
+data, or operate systems in a commercial, governmental, or organizational
+context beyond development, testing, or evaluation.
+
+"Non-Production Use" means use of the Software for development, testing,
+evaluation, education, research, or personal projects that do not constitute
+Production Use.
+
+2. GRANT OF RIGHTS
+
+Subject to the terms of this License, you are granted the following rights:
+
+a) VIEW: You may view, read, and study the Software source code.
+
+b) MODIFY: You may modify the Software for Non-Production Use.
+
+c) NON-PRODUCTION USE: You may use, copy, and run the Software for
+   Non-Production Use without charge.
+
+d) CONTRIBUTE: You may submit contributions to the Software, subject to the
+   Contributor License Agreement.
+
+3. RESTRICTIONS
+
+a) PRODUCTION USE REQUIRES LICENSE: Production Use of the Software requires
+   a separate commercial license. Contact jeffreyjaywork@gmail.com for terms.
+
+b) NO REDISTRIBUTION: You may not redistribute the Software or derivative
+   works except as contributions to the original repository.
+
+c) NO SUBLICENSING: You may not sublicense the Software.
+
+d) ATTRIBUTION: You must retain all copyright notices and this License in
+   any copies or substantial portions of the Software.
+
+4. COMMERCIAL LICENSE
+
+Production Use licenses are available at reasonable terms. Pricing scales
+with usage (gate invocations). Contact jeffreyjaywork@gmail.com for current
+terms.
+
+5. DISCLAIMER
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+6. WHY SOURCE-AVAILABLE?
+
+Governance infrastructure requires trust. You should be able to audit what
+enforces your policies. This license ensures:
+- Code transparency for security review
+- Free evaluation before commitment
+- Sustainable development through commercial licensing
+
+================================================================================
+SUMMARY (not legally binding)
+================================================================================
+
+✅ View source code
+✅ Modify for development/testing
+✅ Use for evaluation and non-production
+✅ Submit contributions
+❌ Use in production without commercial license
+❌ Redistribute or sublicense
+
+For questions: jeffreyjaywork@gmail.com

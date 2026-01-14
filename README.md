@@ -90,7 +90,7 @@ agentkb init
 
 ## License
 
-MIT License. See [LICENSE](LICENSE) for details.
+**Source-Available.** Code visible for audit and trust. Free for development and evaluation; production use requires a commercial license. See [LICENSE](LICENSE) for details.
 
 ---
 
