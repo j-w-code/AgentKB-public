@@ -1,98 +1,103 @@
 # AgentKB
 
-> ⚠️ **PUBLIC REPOSITORY** — This repo contains high-level overview only. Detailed specifications are proprietary.
-
-**Governance-first knowledge infrastructure for AI agents.**
-
-🎬 **[Watch the Demo](https://youtu.be/69m-_s-wf8A)** (1:24) — See the Output Gate block secrets and PII in real-time.
+**Governance-first knowledge management for AI agent systems.**
 
 ---
 
-## The Problem
+## The Core Thesis
 
-AI agents fail predictably when:
+> **AGENTS = PRINCIPALS**
 
-1. **Data is unstructured** → Agents hallucinate facts
-2. **Policies are implicit** → Agents leak PII and secrets  
-3. **Verification is absent** → Outputs can't be traced to sources
-4. **Constraints aren't enforced** → Scope drift corrupts accuracy
+AI agents operating on enterprise data require the same governance controls as human employees:
+- **Access Control** — Who can see what
+- **Output Control** — What can be said externally
 
-Current solutions don't address this:
-- **Vector databases** (Pinecone, Weaviate) optimize for retrieval, not governance
-- **RAG frameworks** (LangChain, LlamaIndex) are pipelines without policy enforcement
-- **Knowledge tools** (Notion, Obsidian) are human-first, agent-hostile
-
-**The gap:** No existing tool treats governance as a first-class feature for AI agent knowledge access.
+Most AI security focuses only on the first. AgentKB addresses both.
 
 ---
 
-## The Solution
+## What AgentKB Does
 
-AgentKB is infrastructure that makes AI agents safe by default—through architecture, not prompting.
+AgentKB provides a structured knowledge base layer with built-in governance primitives:
 
-### Core Primitives
-
-| Primitive | What It Does |
-|-----------|--------------|
-| **Manifest-first traversal** | Explicit navigation graph prevents arbitrary exploration |
-| **Claim typing** | FACT/DERIVED/INFERENCE boundaries at the data layer |
-| **Policy gates** | Sensitivity rules enforced at retrieval time |
-| **Integrity verification** | Hashes, UUIDs, audit trails built-in |
-| **Closed-loop governance** | Errors become rules; the system learns from failures |
-
-### Key Differentiator
-
-Traditional approach: *"Prompt your agent not to leak data"*  
-AgentKB approach: *"Agent cannot access data it shouldn't see"*
-
-The difference is enforcement vs. suggestion.
+1. **Sensitivity Classification** — Content marked by disclosure level
+2. **Role-Based Access** — Agents receive scoped context based on assigned roles
+3. **Output Governance** — Runtime scanning prevents unauthorized disclosure
+4. **Audit Trail** — Every access and output decision logged
 
 ---
 
 ## Architecture Overview
 
 ```
-User Data → Schema Layer → Governance Layer → Agent Interface
-                              ↑                    │
-                              │                    ↓
-                        Rule Generator ←── Error Log
+┌─────────────────────────────────────────────────────┐
+│                    KNOWLEDGE BASE                   │
+│         (Content with sensitivity markers)          │
+└─────────────────────┬───────────────────────────────┘
+                      │
+                      ▼
+┌─────────────────────────────────────────────────────┐
+│                   ACCESS CONTROL                    │
+│        (RBAC: Role → Content scoping)               │
+└─────────────────────┬───────────────────────────────┘
+                      │
+                      ▼
+┌─────────────────────────────────────────────────────┐
+│                 OUTPUT GOVERNANCE                   │
+│     (Scan agent outputs before disclosure)          │
+└─────────────────────────────────────────────────────┘
 ```
 
-**Schema Layer:** What exists (manifests, document typing, relationships)  
-**Governance Layer:** What's allowed (policies, constraints, audit rules)  
-**Agent Interface:** How agents access (traversal, retrieval, verification)  
-**Feedback Loop:** How the system improves (error → pattern → rule)
+---
 
-See [ARCHITECTURE.md](ARCHITECTURE.md) for conceptual details.
+## Use Cases
+
+- **Enterprise AI Assistants** — Ensure agents don't leak confidential data
+- **Multi-tenant Systems** — Scope agent knowledge by customer/role
+- **Compliance Environments** — Audit what agents accessed and disclosed
+- **Development Teams** — Separate internal process docs from public-facing content
+
+---
+
+## Framework Alignment
+
+AgentKB governance primitives align with:
+- NIST AI RMF (Risk Management Framework)
+- OWASP LLM Top 10 (Sensitive Information Disclosure)
+- Emerging AI governance standards
 
 ---
 
 ## Status
 
-**Stage:** Pre-seed / MVP  
-**Current:** Working CLI with Output Gate, RBAC, discovery scan, and closed-loop error logging  
-**Validation:** Architecture aligns with NIST AI RMF 1.0 and OWASP Agentic Security Initiative 2026  
-**Next:** API layer, SDK, enterprise pilot
+AgentKB is under active development. Current focus:
+- ✅ Output governance scanning (operational)
+- 🔄 RBAC content scoping (in progress)
+- 📋 Closed-loop error→rule automation (planned)
 
 ---
 
-## Why Now?
+## Getting Started
 
-2024-2025 saw massive growth in agentic AI deployment. But infrastructure hasn't caught up:
-- Enterprises can't deploy RAG safely (compliance concerns)
-- No standard for agent-friendly knowledge structure
-- "Prompt engineering for safety" doesn't scale
+See the [documentation](docs/) for integration guides and API reference.
 
-The governance gap is the bottleneck for enterprise AI adoption.
-
----
-
-## Contact
-
-**Jeffrey Wiley**  
-📧 jeffreyjaywork@gmail.com  
-📍 Dallas-Fort Worth, Texas
+```bash
+pip install agentkb
+agentkb init
+```
 
 ---
 
-*© 2025-2026 Jeffrey Wiley. All rights reserved.*
+## License
+
+MIT License. See [LICENSE](LICENSE) for details.
+
+---
+
+## Contributing
+
+Contributions welcome. Please review contribution guidelines before submitting PRs.
+
+---
+
+*Built for a world where AI agents are principals, not just tools.*
