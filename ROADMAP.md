@@ -1,78 +1,93 @@
 # AgentKB Roadmap
 
-> ⚠️ **PUBLIC DOCUMENT** — High-level phases only.
+> **PUBLIC DOCUMENT** — High-level phases. Detailed specs in private development repo.
 
 ---
 
 ## Current Status
 
-**Stage:** Pre-seed / MVP
-
-Working CLI implementation:
-- Output Gate (secrets/PII blocking)
-- RBAC with role-based sensitivity ceilings
-- Discovery scan for PII/secret patterns
-- Closed-loop error logging
-- REST API server (FastAPI)
-- MCP server for tool integration
-
-**Validation:** NIST AI RMF 1.0, OWASP Agentic Top 10 2026
+**Stage:** Pre-seed / Active Development  
+**Next Release:** v0.2.0 (Q1 2026) — Source-available code drop
 
 ---
 
-## Phase 1: CLI + Local (MVP) — ✅ Complete
+## Phase 1: Output Gate MVP — ✅ Complete (Internal)
 
-**Delivered:**
-- `agentkb gate` — Output Gate for draft screening
-- `agentkb scan` — PII/secret discovery
-- `agentkb chat` — Gated LLM conversation
+**Delivered (not yet public):**
+- `agentkb gate` — Output Gate for draft screening (PII, secrets, temporal claims)
+- `agentkb scan` — PII/secret discovery across corpus
+- `agentkb chat` — Gated LLM conversation (Ollama, Anthropic, OpenAI, xAI)
 - `agentkb doctor` — Preflight diagnostics
-- RBAC with four default roles
-- REST API + MCP server
+- RBAC sensitivity ceiling enforcement
+- REST API (`/v1/gate`, `/v1/chat`, `/v1/doctor`)
+- MCP server for tool integration
 - CI pipeline (tests, lint, security scan)
 
-**Target:** Developers and AI-first professionals
+**Framework alignment:** NIST AI RMF, OWASP Agentic Top 10 2026
 
 ---
 
-## Phase 2: API + Integrations
+## Phase 2: Output Governance Enhancement + Audit — 🔄 In Progress
 
-**Focus:** Programmatic access and ecosystem integration
+**Focus:** Quantifiable governance + audit capability
 
-- REST API
-- Python and JavaScript SDKs
-- MCP protocol support (Anthropic tool use)
-- LangChain / LlamaIndex adapters
+**Planned deliverables:**
+- **GCS (Governance Compliance Score)** — Quantifiable governance metric
+- **Audit query interface** — `agentkb audit` CLI + REST endpoint
+- **Evidence enforcement** — Block unsourced factual claims
+- **Context integrity** — Drift detection for long sessions
 
-**Target:** Development teams building agentic applications
+**v0.2.0 release includes:**
+- Full source code (Python package)
+- CLI with all Phase 1-2 commands
+- REST API server
+- MCP server
+- Documentation + quickstart guide
+
+**Target:** Q1 2026
 
 ---
 
-## Phase 3: Hosted + Dashboard
+## Phase 3: Access Control + Closed-Loop — 📋 Planned
 
-**Focus:** Enterprise deployment and collaboration
+**Focus:** Complete the AGENTS = PRINCIPALS thesis
 
-- Cloud deployment option
-- Web dashboard for governance configuration
-- Team collaboration features
-- Enterprise governance templates
-- Compliance reporting
+**Planned deliverables:**
+- **Content-layer RBAC** — Retrieval-time enforcement (not just output)
+- **Claim type filtering** — Scope what agents can access by claim type
+- **Closed-loop CLI** — `error-analyze`, `rule-propose`, `rule-apply`
+- **Multi-tenant isolation** — KB-scoped roles + tenant context
 
-**Target:** Enterprise AI deployments
+**Target:** Q2 2026
+
+---
+
+## Phase 4: Enterprise + Ecosystem — 📋 Planned
+
+**Focus:** Enterprise-ready deployment
+
+**Planned deliverables:**
+- **IdP integration** — OIDC/SAML → AgentKB roles
+- **Tamper-proof audit** — Cryptographic signing for compliance
+- **Python/JavaScript SDKs** — Native integration libraries
+- **Audit dashboard** — Web UI for governance visibility
+- **Meta-governance** — Rule lifecycle (retire obsolete rules)
+
+**Target:** Q3-Q4 2026
 
 ---
 
 ## What We're Looking For
 
-- **Funding:** Pre-seed to build MVP and reach first customers
-- **Design partners:** Organizations with AI governance challenges
-- **Technical feedback:** Developers building agentic systems
+- **Design partners** — Organizations with AI governance challenges
+- **Early adopters** — Developers building agentic applications
+- **Technical feedback** — Framework gaps, UX friction, use case coverage
 
 ---
 
 ## Contact
 
-**Jeffrey Wiley**  
+**Jeffrey Wiley** — Founder  
 📧 jeffreyjaywork@gmail.com
 
 ---

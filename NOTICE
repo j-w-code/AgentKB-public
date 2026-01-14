@@ -1,10 +1,18 @@
-AgentKB — Proprietary Notice
+AgentKB — Copyright Notice
 
 Copyright © 2025-2026 Jeffrey Wiley. All rights reserved.
 
-This repository contains high-level conceptual documentation only.
-Detailed specifications, schemas, and implementation are proprietary
-and not included in this public repository.
+This repository is licensed under the AgentKB Source-Available License.
+See LICENSE for full terms.
+
+SUMMARY:
+- Source code visible for audit and trust
+- Free for development, testing, and evaluation
+- Production use requires a commercial license
+
+CURRENT STATE:
+This repository currently contains design documents and roadmap.
+Source code will be included in v0.2.0 release (Q1 2026).
 
 For licensing inquiries or partnership discussions:
 jeffreyjaywork@gmail.com
