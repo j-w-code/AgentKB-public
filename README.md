@@ -104,8 +104,9 @@ agentkb demo        # See output gate in action
 
 ## License
 
-**Source-Available.** Code visible for audit and trust. 
+**Source-Available (v0.2.0).** Code will be released for audit and trust with v0.2.0 (Q1 2026).
 
+When released:
 - ✅ View, modify, run for development/testing
 - ✅ Evaluate before commitment
 - ❌ Production use requires commercial license
