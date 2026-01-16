@@ -21,35 +21,51 @@ Most AI security focuses only on access. AgentKB addresses all three.
 
 AgentKB provides governance infrastructure for AI agents:
 
-1. **Output Gate** — Block PII, secrets, and unverifiable claims before disclosure
-2. **Role-Based Access** — Scope agent permissions by role and sensitivity level
-3. **Audit Logging** — Every gate decision logged for compliance
-4. **Claim Validation** — Enforce evidence requirements for factual claims
+1. **Access Control** — Scope what agents can read by role and sensitivity [Phase 3]
+2. **Output Gate** — Block PII, secrets, and unverifiable claims before disclosure [Available]
+3. **Audit Logging** — Every gate decision logged for compliance [Available]
+4. **Claim Validation** — Enforce evidence requirements for factual claims [Available]
 
 ---
 
-## Architecture
+## Architecture: Two-Gate Model
 
 ```
-┌─────────────────────────────────────────────────────┐
-│                    KNOWLEDGE BASE                   │
-│         (Content with sensitivity markers)          │
-└─────────────────────┬───────────────────────────────┘
-                      │
-                      ▼
-┌─────────────────────────────────────────────────────┐
-│                   ACCESS CONTROL                    │
-│        (RBAC: Role → Content scoping)               │
-│                  [Phase 3]                          │
-└─────────────────────┬───────────────────────────────┘
-                      │
-                      ▼
-┌─────────────────────────────────────────────────────┐
-│                 OUTPUT GOVERNANCE                   │
-│     (Scan agent outputs before disclosure)          │
-│              [Phase 1-2: Available]                 │
-└─────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────┐
+│                    KNOWLEDGE BASE                         │
+│         (Content with sensitivity markers)                │
+└────────────────────┬─────────────────────────────────────┘
+                     │
+                     ▼
+┌──────────────────────────────────────────────────────────┐
+│                 ACCESS GATE (Phase 3)                     │
+│   • Filters content BEFORE agent sees it                 │
+│   • RBAC: Role → Content scoping                         │
+│   • Prevents sensitive data reaching LLM provider        │
+└────────────────────┬─────────────────────────────────────┘
+                     │
+                     ▼
+                   AGENT
+                     │
+                     ▼
+┌──────────────────────────────────────────────────────────┐
+│                 OUTPUT GATE (Available)                   │
+│   • Scans agent outputs before disclosure                │
+│   • PII/secret detection, claim validation               │
+│   • Governance Compliance Score (GCS) enforcement        │
+└────────────────────┬─────────────────────────────────────┘
+                     │
+                     ▼
+                  OUTPUT
 ```
+
+### Two-Gate Protection
+
+**Input Side (Phase 3):** Access control filters content *before* it reaches the agent/LLM provider. Agents only see what their role permits.
+
+**Output Side (Available):** Output gate validates agent responses before disclosure. Blocks PII, secrets, and unverifiable claims.
+
+Together: Defense-in-depth for enterprise AI.
 
 ---
 
