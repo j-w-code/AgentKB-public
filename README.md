@@ -89,45 +89,39 @@ AgentKB governance primitives align with:
 
 ## Current Status
 
-> ⚠️ **Pre-release.** Source code release coming with v0.2.0.
+> ✅ **Phase 1-2 Public Release** (v0.4.9)
 
 | Phase | Focus | Status |
 |-------|-------|--------|
-| **Phase 1** | Output Gate MVP | ✅ Complete (internal) |
-| **Phase 2** | Audit + GCS + Evidence | 🔄 In Progress |
+| **Phase 1** | Output Gate MVP | ✅ Complete |
+| **Phase 2** | Audit + GCS + Evidence | ✅ Complete |
 | **Phase 3** | Access Control (RBAC enforcement) | 📋 Planned |
 | **Phase 4** | Enterprise (IdP, SDKs, Dashboard) | 📋 Planned |
 
-**What's in this repo now:** Design documents, architecture overview, roadmap.
-
-**Coming in v0.2.0:** Full source code, CLI, REST API, MCP server.
+**Available now:** CLI, REST API, MCP server, multi-provider LLM support.
 
 ---
 
-## Getting Started (v0.2.0)
-
-Source code release planned for Q1 2026. When available:
+## Getting Started
 
 ```bash
 pip install agentkb
-agentkb doctor      # Preflight check
-agentkb demo        # See output gate in action
+agentkb init        # Initialize workspace
+agentkb doctor      # Verify setup
+agentkb gate --text "Hello world"  # Test output gate
 ```
 
-**Want early access?** Contact us (see below).
+See the [User Guide](https://github.com/j-w-code/AgentKB) for full documentation.
 
 ---
 
 ## License
 
-**Source-Available (v0.2.0).** Code will be released for audit and trust with v0.2.0 (Q1 2026).
+**Source-Available.** See [LICENSE](LICENSE) for details.
 
-When released:
 - ✅ View, modify, run for development/testing
 - ✅ Evaluate before commitment
 - ❌ Production use requires commercial license
-
-See [LICENSE](LICENSE) for details.
 
 ---
 

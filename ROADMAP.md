@@ -6,14 +6,14 @@
 
 ## Current Status
 
-**Stage:** Pre-seed / Active Development  
-**Next Release:** v0.2.0 (Q1 2026) — Source-available code drop
+**Stage:** Phase 1-2 Public Release  
+**Current Version:** v0.4.9 (January 2026)
 
 ---
 
-## Phase 1: Output Gate MVP — ✅ Complete (Internal)
+## Phase 1: Output Gate MVP — ✅ Complete
 
-**Delivered (not yet public):**
+**Delivered:**
 - `agentkb gate` — Output Gate for draft screening (PII, secrets, temporal claims)
 - `agentkb scan` — PII/secret discovery across corpus
 - `agentkb chat` — Gated LLM conversation (Ollama, Anthropic, OpenAI, xAI)
@@ -27,24 +27,19 @@
 
 ---
 
-## Phase 2: Output Governance Enhancement + Audit — 🔄 In Progress
+## Phase 2: Output Governance Enhancement + Audit — ✅ Complete
 
 **Focus:** Quantifiable governance + audit capability
 
-**Planned deliverables:**
-- **GCS (Governance Compliance Score)** — Quantifiable governance metric
+**Delivered:**
+- **GCS (Governance Compliance Score)** — Quantifiable governance metric with decision gates
 - **Audit query interface** — `agentkb audit` CLI + REST endpoint
 - **Evidence enforcement** — Block unsourced factual claims
-- **Context integrity** — Drift detection for long sessions
+- **Context integrity** — Session gate with drift detection
+- **3-tier semantic detection** — Presidio + embeddings + optional LLM evaluator
+- **Performance benchmarks** — NFR validation for latency/throughput
 
-**v0.2.0 release includes:**
-- Full source code (Python package)
-- CLI with all Phase 1-2 commands
-- REST API server
-- MCP server
-- Documentation + quickstart guide
-
-**Target:** Q1 2026
+**Completed:** January 2026
 
 ---
 
