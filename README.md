@@ -104,14 +104,29 @@ AgentKB governance primitives align with:
 
 ## Getting Started
 
+### Installation
+
+Download the wheel for your platform from [GitHub Releases](https://github.com/j-w-code/AgentKB-public/releases):
+
+| Platform | Filename |
+|----------|----------|
+| Windows | `agentkb-*-cp312-cp312-win_amd64.whl` |
+| Linux | `agentkb-*-cp312-cp312-manylinux*.whl` |
+| macOS | `agentkb-*-cp312-cp312-macosx*.whl` |
+
+Then install:
+
 ```bash
-pip install agentkb
+pip install agentkb-0.4.9-cp312-cp312-<your-platform>.whl
+```
+
+### Quick Start
+
+```bash
 agentkb init        # Initialize workspace
 agentkb doctor      # Verify setup
 agentkb gate --text "Hello world"  # Test output gate
 ```
-
-See the [User Guide](https://github.com/j-w-code/AgentKB) for full documentation.
 
 ---
 
