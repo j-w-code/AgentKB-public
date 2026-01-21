@@ -83,7 +83,7 @@ Together: Defense-in-depth for enterprise AI.
 AgentKB governance primitives align with:
 - **NIST AI RMF 1.0** — GOVERN, MAP, MEASURE functions
 - **OWASP Agentic Top 10 (2026)** — 8/10 categories covered
-- **Grok Resilience Benchmark** — 4.7/5 ("Highly Resilient")
+- **Real-World Systems Failure Tests** — 4.7/5 (Therac-25, Ariane 5 coverage)
 
 ---
 

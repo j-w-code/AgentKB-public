@@ -101,7 +101,7 @@ AgentKB's governance patterns align with established frameworks:
 
 - **NIST AI RMF 1.0** — GOVERN, MAP, MEASURE functions
 - **OWASP Agentic Security Initiative 2026** — 8/10 categories covered
-- **Grok Resilience Benchmark** — 4.7/5 ("Highly Resilient")
+- **Real-World Systems Failure Tests** — 4.7/5 (Therac-25, Ariane 5 coverage)
 
 These alignments were discovered post-derivation. The patterns emerged from first principles, then validated against industry standards.
 
