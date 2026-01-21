@@ -7,7 +7,7 @@
 ## Current Status
 
 **Stage:** Phase 1-2 Public Release  
-**Current Version:** v0.4.9 (January 2026)
+**Current Version:** v0.4.10 (January 2026)
 
 ---
 

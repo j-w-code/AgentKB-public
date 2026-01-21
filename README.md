@@ -89,7 +89,7 @@ AgentKB governance primitives align with:
 
 ## Current Status
 
-> ✅ **Phase 1-2 Public Release** (v0.4.9)
+> ✅ **Phase 1-2 Public Release** (v0.4.10)
 
 | Phase | Focus | Status |
 |-------|-------|--------|
@@ -117,7 +117,7 @@ Download the wheel for your platform from [GitHub Releases](https://github.com/j
 Then install:
 
 ```bash
-pip install agentkb-0.4.9-cp312-cp312-<your-platform>.whl
+pip install agentkb-0.4.10-cp312-cp312-<your-platform>.whl
 ```
 
 ### Quick Start
