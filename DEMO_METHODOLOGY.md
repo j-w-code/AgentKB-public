@@ -104,12 +104,15 @@ The mock mode ensures reproducible demo flow. Real LLM testing confirmed the Out
 
 ## Current Access
 
-AgentKB is currently in **private development**. The codebase demonstrated in the video is not yet publicly available.
+AgentKB Phase 1-2 is now **publicly available**.
 
-**When public release occurs:**
-- The installation steps shown will be reproducible
-- The commands will work identically
-- This methodology document will serve as baseline comparison
+```bash
+pip install agentkb
+agentkb init
+agentkb doctor
+```
+
+The commands demonstrated in the video work identically to what you'll experience.
 
 ---
 

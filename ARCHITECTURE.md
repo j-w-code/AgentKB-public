@@ -107,7 +107,8 @@ Agent Error → Log → Pattern Detection → Rule Generation → Governance Upd
 ## Current Implementation
 
 A working MVP exists with:
-- **Output Gate** — Blocks secrets and PII at output time (access ≠ disclosure)
+- **Output Gate** — Blocks secrets and PII at output time
+- **Access Gate** — Role-based content scoping at retrieval time (Phase 3)
 - **RBAC** — Role-based access with sensitivity ceilings
 - **Discovery scan** — PII/secret pattern detection across corpus
 - **Closed-loop logging** — Blocked outputs feed error event schema
