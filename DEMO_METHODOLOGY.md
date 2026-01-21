@@ -104,10 +104,12 @@ The mock mode ensures reproducible demo flow. Real LLM testing confirmed the Out
 
 ## Current Access
 
-AgentKB Phase 1-2 is now **publicly available**.
+AgentKB Phase 1-2 is now **publicly available** as compiled wheels.
+
+Download the wheel for your platform from [GitHub Releases](https://github.com/j-w-code/AgentKB-public/releases):
 
 ```bash
-pip install agentkb
+pip install agentkb-0.4.10-cp312-cp312-<your-platform>.whl
 agentkb init
 agentkb doctor
 ```

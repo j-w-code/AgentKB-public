@@ -11,8 +11,8 @@ SUMMARY:
 - Production use requires a commercial license
 
 CURRENT STATE:
-This repository currently contains design documents and roadmap.
-Source code will be included in v0.2.0 release (Q1 2026).
+Phase 1-2 is publicly available as compiled binary wheels (v0.4.10).
+Download from GitHub Releases. Source available under commercial license.
 
 For licensing inquiries or partnership discussions:
 jeffreyjaywork@gmail.com
