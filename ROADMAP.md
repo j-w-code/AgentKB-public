@@ -82,9 +82,9 @@
 
 ## Contact
 
-**Jeffrey Wiley** — Founder  
-📧 jeffreyjaywork@gmail.com
+**J.W.** — Founder  
+📧 agentkb_jw@proton.me
 
 ---
 
-*© 2025-2026 Jeffrey Wiley. All rights reserved.*
+*© 2025-2026 J.W. All rights reserved.*

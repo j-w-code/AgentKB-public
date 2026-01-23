@@ -134,4 +134,4 @@ A: Defense-in-depth. LLM refusal + Output Gate blocking = redundant protection. 
 
 ---
 
-*© 2025-2026 Jeffrey Wiley. All rights reserved.*
+*© 2025-2026 J.W. All rights reserved.*

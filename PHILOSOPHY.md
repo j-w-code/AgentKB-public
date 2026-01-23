@@ -107,7 +107,7 @@ These alignments were discovered post-derivation. The patterns emerged from firs
 
 ---
 
-*Jeffrey Wiley*  
+*J.W.*  
 *Founder, AgentKB*
 
-*© 2025-2026 Jeffrey Wiley. All rights reserved.*
+*© 2025-2026 J.W. All rights reserved.*

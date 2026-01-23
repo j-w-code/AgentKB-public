@@ -142,8 +142,9 @@ agentkb gate --text "Hello world"  # Test output gate
 
 ## Contact
 
-**Jeffrey Wiley** — Founder  
-📧 jeffreyjaywork@gmail.com
+**J.W.** — Founder  
+📧 agentkb_jw@proton.me  
+🐦 [@HSThurston](https://x.com/HSThurston) (Hermes Thurston — Creative Collaborator)
 
 - Commercial licensing inquiries
 - Design partner opportunities

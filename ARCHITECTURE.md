@@ -118,6 +118,6 @@ A working MVP exists with:
 
 ---
 
-*For detailed specifications, contact: jeffreyjaywork@gmail.com*
+*For detailed specifications, contact: agentkb_jw@proton.me*
 
-*© 2025-2026 Jeffrey Wiley. All rights reserved.*
+*© 2025-2026 J.W. All rights reserved.*

@@ -1,6 +1,7 @@
 # Agentic Park: A Parable for AI Governance
 
-**Author:** Jeffrey Wiley  
+**Author:** J.W.  
+**Creative Collaborator:** Hermes Thurston ([@HSThurston](https://x.com/HSThurston))  
 **Date:** January 2026
 
 ---
@@ -159,4 +160,4 @@ Learn more at [github.com/j-w-code/AgentKB-public](https://github.com/j-w-code/A
 
 *This analogy is offered to the AI governance community as a didactic framework. Use it, remix it, cite it, debate it. The goal is shared: prevent the fictional disaster from becoming reality.*
 
-**License:** CC BY 4.0 - Jeffrey Wiley, 2026
+**License:** CC BY 4.0 - J.W., 2026
