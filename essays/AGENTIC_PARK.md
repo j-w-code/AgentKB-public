@@ -78,6 +78,22 @@ You cannot prompt an AI agent to follow rules it hasn't internalized. You can on
 
 **AgentKB provides governance, not safety.** We don't try to make agents "behave better"—we structurally enforce boundaries they cannot cross.
 
+## The Deeper Insight: Agents Are Principals
+
+Here's what the analogy reveals:
+
+Jurassic Park didn't fail because dinosaurs *disobeyed instructions*. The dinosaurs had no concept of obedience. They acted according to their nature within inadequate constraints.
+
+AI agents don't "disobey" prompts. They optimize within inadequate constraints.
+
+Critically, neither dinosaurs nor AI agents are *moral* agents. The velociraptors weren't evil—they were driven by their constellation of attributes. When an AI agent produces harmful output, there's no moral dimension to it. The agent optimizes; harm is incidental.
+
+**This is precisely why "Safety" is the wrong frame.** Safety discourse assumes moral correction is possible—that we can train agents to be ethical, aligned, trustworthy. But you cannot instill ethics in an entity that has no moral faculty. You can only build structural constraints.
+
+**Agents must be treated as principals**—entities operating within structural governance, not instructions requiring behavioral compliance. Like human employees in enterprise environments, agents need both access controls (what they can read) and output controls (what they can disclose).
+
+The paradox: proper governance actually *increases* what agents can permissibly do. When structural constraints are reliable, organizations can grant agents broader capabilities with confidence. Governance enables, not restricts.
+
 ## The Park We're Building
 
 Every major enterprise deploying AI is building Jurassic Park:
