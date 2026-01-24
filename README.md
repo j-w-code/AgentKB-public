@@ -104,6 +104,8 @@ AgentKB governance primitives align with:
 
 ## Getting Started
 
+> 📖 **New to AgentKB?** See the [User Guide](USER_GUIDE.md) for complete setup instructions, including Python installation, LLM configuration, and troubleshooting.
+
 ### Installation
 
 Download the wheel for your platform from [GitHub Releases](https://github.com/j-w-code/AgentKB-public/releases):
