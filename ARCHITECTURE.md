@@ -114,7 +114,7 @@ A working MVP exists with:
 - **Closed-loop logging** — Blocked outputs feed error event schema
 - **Replay harness** — Deterministic regression tests from historical failures
 
-**Framework alignment:** Architecture independently derived, later validated against NIST AI RMF 1.0 (GOVERN, MAP, MEASURE) and OWASP Agentic Security Initiative 2026 (8/10 categories covered).
+**Framework alignment:** Architecture independently derived, later validated against NIST AI RMF 1.0 (GOVERN, MAP, MEASURE), OWASP Agentic Security Initiative 2026 (8/10 categories), Gartner AI TRiSM (AI Governance + Runtime Enforcement), and Proofpoint AI Security research.
 
 ---
 

@@ -78,25 +78,38 @@ Together: Defense-in-depth for enterprise AI.
 
 ---
 
-## Framework Alignment
+## Framework Alignment & Compliance
 
 AgentKB governance primitives align with:
-- **NIST AI RMF 1.0** — GOVERN, MAP, MEASURE functions
-- **OWASP Agentic Top 10 (2026)** — 8/10 categories covered
-- **Real-World Systems Failure Tests** — 4.7/5 (Therac-25, Ariane 5 coverage)
+- **NIST AI RMF 1.0** — Strong (3/4 functions)
+- **OWASP Agentic Top 10 (2026)** — Strong (8/10 categories)
+- **Real-World Systems Failure Tests** — Strong (4.7/5 categories)
+- **Gartner AI TRiSM** — Strong (3/5 pyramid layers)
+- **Proofpoint AI Security** — Strong (4/5 requirements)
+
+### Compliance Support
+
+| Standard | AgentKB Support |
+|----------|----------------|
+| **HIPAA** | PII detection, audit logging, sensitivity classification |
+| **SOX** | Immutable audit trail, role-based access, governance versioning |
+| **GDPR** | Data classification, output filtering, consent-aware scoping |
 
 ---
 
 ## Current Status
 
-> ✅ **Phase 1-2 Public Release** (v0.4.10)
+> ✅ **Phase 1-2.7 Public Release** (v0.5.0)
 
 | Phase | Focus | Status |
 |-------|-------|--------|
 | **Phase 1** | Output Gate MVP | ✅ Complete |
 | **Phase 2** | Audit + GCS + Evidence | ✅ Complete |
+| **Phase 2.5-2.7** | Structural Enforcement (3-tier detection, Audit Bus) | ✅ Complete |
 | **Phase 3** | Access Control (RBAC enforcement) | 📋 Planned |
 | **Phase 4** | Enterprise (IdP, SDKs, Dashboard) | 📋 Planned |
+
+**Test Coverage:** 675 tests passing • 67% code coverage • GCS 100
 
 **Available now:** CLI, REST API, MCP server, multi-provider LLM support.
 
@@ -119,7 +132,7 @@ Download the wheel for your platform from [GitHub Releases](https://github.com/j
 Then install:
 
 ```bash
-pip install agentkb-0.4.10-cp312-cp312-<your-platform>.whl
+pip install agentkb-0.5.0-cp312-cp312-<your-platform>.whl
 ```
 
 ### Quick Start
