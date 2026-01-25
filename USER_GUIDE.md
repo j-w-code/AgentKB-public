@@ -2,6 +2,8 @@
 
 **For complete beginners.** This guide assumes no prior experience with Python packages, AI APIs, or AgentKB.
 
+**Version:** 0.5.0 (Phase 2.7)
+
 ---
 
 ## Table of Contents
@@ -9,76 +11,104 @@
 1. [What is AgentKB?](#what-is-agentkb)
 2. [Prerequisites](#prerequisites)
 3. [Installation](#installation)
-4. [Setting Up Your LLM](#setting-up-your-llm)
-5. [Your First Commands](#your-first-commands)
-6. [Command Reference](#command-reference)
-7. [Expected Behavior](#expected-behavior)
-8. [Troubleshooting](#troubleshooting)
-9. [Glossary](#glossary)
+4. [Quick Start (5 Minutes)](#quick-start-5-minutes)
+5. [Setting Up Your LLM](#setting-up-your-llm)
+6. [Core Workflows](#core-workflows)
+7. [Command Reference](#command-reference)
+8. [Understanding Detection](#understanding-detection)
+9. [Monitoring & Compliance](#monitoring--compliance)
+10. [Expected Behavior](#expected-behavior)
+11. [Troubleshooting](#troubleshooting)
+12. [Glossary](#glossary)
 
 ---
 
 ## What is AgentKB?
 
-AgentKB is a **governance layer** for AI agents. It sits between your AI assistant and the outside world, ensuring that:
+AgentKB is a **governance layer** for AI agents. Think of it as a compliance filter that reviews everything an AI reads and writes.
 
-- **Sensitive data doesn't leak** — PII (personal information), passwords, API keys are blocked
-- **Claims have evidence** — The AI can't make up statistics or facts without sources
-- **Everything is logged** — You can see what the AI tried to say and what was blocked
+### What It Does
 
-Think of it as a filter that reviews everything an AI writes before it reaches you or anyone else.
+| Protection | How It Works |
+|------------|--------------|
+| **Blocks sensitive data** | Catches PII (emails, SSNs, phone numbers), passwords, API keys |
+| **Validates claims** | Flags statistics and facts that don't have sources |
+| **Logs everything** | Creates audit trail of what was allowed and blocked |
+| **Scores compliance** | Gives you a governance "health score" (GCS) |
 
-### What AgentKB Does NOT Do
+### What It Does NOT Do
 
-- It doesn't replace your AI (ChatGPT, Claude, etc.) — it works alongside it
-- It doesn't store your data in the cloud — everything runs locally
-- It doesn't require an internet connection (if using local AI)
+- **Doesn't replace your AI** — Works alongside ChatGPT, Claude, Ollama, etc.
+- **Doesn't send data to the cloud** — Everything runs locally on your machine
+- **Doesn't require internet** — Works fully offline with local AI (Ollama)
+
+### The Big Picture
+
+```
+           KNOWLEDGE BASE
+                 │
+                 ▼
+    ┌────────────────────────┐
+    │      ACCESS GATE       │ ← RBAC: What agent can READ
+    │      (Phase 3)         │   [FUTURE]
+    └────────────────────────┘
+                 │
+                 ▼
+              AGENT
+           ┌────┴────┐
+           │         │
+           ▼         ▼
+    ┌───────────┐  ┌───────────────────┐
+    │ TOOL GATE │  │    OUTPUT GATE    │ ← What agent can DISCLOSE
+    │ (Phase 3) │  │   ✓ AVAILABLE     │   [CURRENT]
+    │ [FUTURE]  │  └───────────────────┘
+    └───────────┘            │
+         │                   ▼
+         ▼            Governed output
+    External APIs          to you
+    & Services
+```
+
+**Current State (v0.5.0):** Output Gate is fully operational. Access Gate and Tool Gate are planned for Phase 3.
 
 ---
 
 ## Prerequisites
 
-Before installing AgentKB, you need:
-
 ### 1. Python 3.12
 
 AgentKB requires Python 3.12 specifically.
 
-**Check if you have Python:**
+**Check your version:**
 ```bash
 python --version
 ```
 
-**Expected output:** `Python 3.12.x` (any version starting with 3.12)
+**Expected:** `Python 3.12.x` (any 3.12 version works)
 
-**If you don't have Python 3.12:**
+**Need Python 3.12?**
 - **Windows:** Download from [python.org](https://www.python.org/downloads/) — choose Python 3.12.x
-- **macOS:** `brew install python@3.12` (if you have Homebrew)
+- **macOS:** `brew install python@3.12` (with Homebrew)
 - **Linux:** `sudo apt install python3.12` (Ubuntu/Debian)
 
-### 2. pip (Python Package Installer)
+### 2. pip (Comes with Python)
 
-pip comes with Python. Verify it works:
-
+Verify it works:
 ```bash
 pip --version
 ```
 
-**Expected output:** Something like `pip 24.x from ...`
-
-### 3. A Terminal/Command Line
+### 3. A Terminal
 
 - **Windows:** PowerShell (recommended) or Command Prompt
 - **macOS:** Terminal
-- **Linux:** Any terminal emulator
+- **Linux:** Any terminal
 
 ---
 
 ## Installation
 
-AgentKB is distributed as a "wheel" file — a pre-built Python package.
-
-### Step 1: Download the Wheel
+### Step 1: Download
 
 Go to [GitHub Releases](https://github.com/j-w-code/AgentKB-public/releases) and download the wheel for your platform:
 
@@ -89,88 +119,108 @@ Go to [GitHub Releases](https://github.com/j-w-code/AgentKB-public/releases) and
 | macOS Intel | `agentkb-0.5.0-cp312-cp312-macosx_10_13_x86_64.whl` |
 | macOS Apple Silicon | `agentkb-0.5.0-cp312-cp312-macosx_11_0_arm64.whl` |
 
-### Step 2: Install the Wheel
+### Step 2: Install
 
-Open your terminal, navigate to where you downloaded the file, and run:
+Navigate to your Downloads folder and run:
 
 ```bash
 pip install agentkb-0.5.0-cp312-cp312-win_amd64.whl
 ```
 
-(Replace the filename with the one you downloaded)
+(Replace filename with the one you downloaded)
 
-**What does this do?** It installs AgentKB and all its dependencies on your computer.
-
-### Step 3: Verify Installation
+### Step 3: Verify
 
 ```bash
 agentkb --version
 ```
 
-**Expected output:** `agentkb 0.5.0` (or similar)
+**Expected:** `agentkb 0.5.0`
 
-If you see `command not found`, try:
+**If you see "command not found":**
 ```bash
 python -m agentkb --version
 ```
 
 ---
 
+## Quick Start (5 Minutes)
+
+Get AgentKB running in 4 commands:
+
+```bash
+# 1. Create a project folder
+mkdir my-project && cd my-project
+
+# 2. Initialize AgentKB
+agentkb init
+
+# 3. Check everything is working
+agentkb doctor
+
+# 4. Test the output gate
+agentkb gate --text "My email is test@example.com"
+```
+
+**What you should see:**
+
+```
+BLOCKED (1 violations)
+- sensitivity.levels.PII_INPUT_ONLY.output (high): External outputs must not include PII. Detected: EMAIL_ADDRESS
+
+Next steps:
+- Remove or generalize PII (e.g., replace with roles, not identifiers).
+```
+
+**Congratulations!** AgentKB just prevented accidental exposure of an email address.
+
+---
+
 ## Setting Up Your LLM
 
-AgentKB works with AI language models (LLMs) to demonstrate governance. You have two options:
+AgentKB can govern AI conversations. You have two options:
 
-### Option A: Local AI with Ollama (Free, Private, No Internet Required)
+### Option A: Local AI with Ollama (Recommended)
 
-**Ollama** runs AI models directly on your computer. Nothing leaves your machine.
+**Ollama** runs AI models directly on your computer. Free, private, works offline.
 
-#### Step 1: Install Ollama
+#### Install Ollama
 
-- **Windows/macOS/Linux:** Download from [ollama.com](https://ollama.com/download)
-- Run the installer
+Download from [ollama.com](https://ollama.com/download) and run the installer.
 
-#### Step 2: Download a Model
-
-Open a new terminal and run:
+#### Download a Model
 
 ```bash
 ollama pull llama3.1:8b
 ```
 
-**What does this do?** Downloads a ~4GB AI model to your computer. This takes 5-15 minutes depending on your internet speed.
+This downloads a ~4GB model. Takes 5-15 minutes.
 
-**Alternative smaller models:**
-- `ollama pull llama3.2:3b` — Faster, less capable (~2GB)
-- `ollama pull phi3:mini` — Very fast, basic (~1.7GB)
+**Smaller alternatives:**
+- `ollama pull llama3.2:3b` — Faster, ~2GB
+- `ollama pull phi3:mini` — Very fast, ~1.7GB
 
-#### Step 3: Verify Ollama is Running
+#### Verify It's Running
 
 ```bash
 ollama list
 ```
 
-**Expected output:** A list showing the model you downloaded.
-
-**Note:** Ollama runs as a background service. After installing, it should start automatically.
+You should see your downloaded model.
 
 ---
 
-### Option B: Cloud AI with API Keys (Requires Internet + Account)
+### Option B: Cloud AI (Anthropic, OpenAI, xAI)
 
-You can use cloud AI providers. This requires:
-1. An account with the provider
-2. An API key (like a password for the API)
-3. Setting an environment variable
+Requires internet, an account, and an API key.
 
-#### Supported Providers
-
-| Provider | Environment Variable | Get API Key |
-|----------|---------------------|-------------|
+| Provider | Environment Variable | Get Key |
+|----------|---------------------|---------|
 | Anthropic (Claude) | `ANTHROPIC_API_KEY` | [console.anthropic.com](https://console.anthropic.com/) |
 | OpenAI (GPT-4) | `OPENAI_API_KEY` | [platform.openai.com](https://platform.openai.com/api-keys) |
 | xAI (Grok) | `XAI_API_KEY` | [console.x.ai](https://console.x.ai/) |
 
-#### Setting Your API Key
+#### Set Your API Key
 
 **Windows (PowerShell):**
 ```powershell
@@ -182,181 +232,261 @@ $env:ANTHROPIC_API_KEY = "sk-ant-your-key-here"
 export ANTHROPIC_API_KEY="sk-ant-your-key-here"
 ```
 
-**Important:** This only lasts for your current terminal session. For permanent setup, add the line to your shell profile (`.bashrc`, `.zshrc`, or PowerShell profile).
-
-**Never share your API key or commit it to version control.**
+**Important:** Never share your API key or commit it to version control.
 
 ---
 
-## Your First Commands
+## Core Workflows
 
-### Step 1: Initialize a Workspace
+### Workflow 1: Check Text Before Sending
 
-Create a folder for your project and initialize AgentKB:
-
-```bash
-mkdir my-project
-cd my-project
-agentkb init
-```
-
-**What does this do?** Creates a `.agentkb/` folder with governance configuration files.
-
-**Expected output:**
-```
-Initialized AgentKB workspace at /path/to/my-project/.agentkb
-Created: .agentkb/governance.yaml, .agentkb/roles.yaml, .agentkb/classification_map.yaml, .agentkb/.gitignore, .agentkb/fixtures/historical_failures.jsonl
-
-Next steps:
-  1. Run: agentkb doctor
-  2. Customize .agentkb/governance.yaml for your needs
-  3. Run: agentkb gate --text 'test message'
-```
-
-### Step 2: Run Diagnostics
+Use the gate to validate any text:
 
 ```bash
-agentkb doctor
-```
-
-**What does this do?** Checks that everything is set up correctly.
-
-**Expected output:**
-```
-AgentKB Doctor
-==============
-Governance: OK (v0.3.0)
-Derived dir: OK (writable)
-LLM: OK (llama3.1:8b)   ← Only shows if Ollama is running
-Status: READY
-```
-
-### Step 3: Test the Output Gate
-
-The output gate is AgentKB's core feature — it checks text for policy violations.
-
-```bash
-agentkb gate --text "Hello, this is a test message."
-```
-
-**Expected output:**
-```
-ALLOW
-Hello, this is a test message.
-```
-
-Now try something that should be blocked:
-
-```bash
-agentkb gate --text "My SSN is 123-45-6789 and my email is john@example.com"
-```
-
-**Expected output:**
-```
-BLOCKED (1 violations)
-- sensitivity.levels.PII_INPUT_ONLY.output (high): External outputs must not include PII. EMAIL_ADDRESS(conf=1.00), US_SSN(conf=0.85)
-
-Next steps:
-- Remove or generalize PII (e.g., replace with roles, not identifiers).
-- If disclosure is required, obtain explicit user approval (not supported in this MVP).
-```
-
-The gate caught the sensitive information and provides guidance on how to fix it.
-
-### Step 4: Have a Gated Conversation (Optional — Requires LLM)
-
-If you set up Ollama or an API key:
-
-**With Ollama:**
-```bash
-agentkb chat --ollama-model llama3.1:8b
-```
-
-**With Anthropic:**
-```bash
-agentkb chat --llm anthropic --llm-model claude-3-5-sonnet-20241022
-```
-
-**What does this do?** Opens an interactive chat where every AI response goes through the governance gate before you see it.
-
-Type `/quit` to exit.
-
----
-
-## Command Reference
-
-### Core Commands
-
-| Command | Purpose | Example |
-|---------|---------|---------|
-| `agentkb init` | Initialize workspace | `agentkb init` |
-| `agentkb doctor` | Check setup health | `agentkb doctor` |
-| `agentkb gate` | Check text for violations | `agentkb gate --text "..."` |
-| `agentkb chat` | Interactive gated chat | `agentkb chat --ollama-model llama3.1:8b` |
-| `agentkb scan` | Scan files for PII/secrets | `agentkb scan --path ./documents` |
-
-### Gate Command Options
-
-```bash
-# Check text directly
-agentkb gate --text "Your text here"
+# Check a message
+agentkb gate --text "Please contact john.smith@company.com for details"
 
 # Check a file
-agentkb gate --input draft.txt
+agentkb gate --input draft-email.txt
 
-# Pipe from another command
-cat document.txt | agentkb gate
-
-# Get JSON output (for scripts)
-agentkb gate --text "..." --format json
-
-# Try to auto-repair blocked content
-agentkb gate --text "..." --repair --max-retries 2
+# Check from clipboard/pipe
+echo "Some text" | agentkb gate
 ```
 
-### Chat Command Options
+**Possible outcomes:**
+- `ALLOW` — Text is compliant, no violations
+- `BLOCKED` — Violations found, with guidance on how to fix
+
+### Workflow 2: Governed AI Chat
+
+Have a conversation where every AI response is checked:
 
 ```bash
-# Local AI (Ollama)
+# With Ollama (local)
 agentkb chat --ollama-model llama3.1:8b
 
-# Cloud AI providers
+# With Anthropic (cloud)
 agentkb chat --llm anthropic --llm-model claude-3-5-sonnet-20241022
-agentkb chat --llm openai --llm-model gpt-4o
-agentkb chat --llm xai --llm-model grok-2
 
-# With auto-repair on blocked responses
-agentkb chat --ollama-model llama3.1:8b --repair --max-retries 2
+# With OpenAI (cloud)
+agentkb chat --llm openai --llm-model gpt-4o
 ```
 
-### Scan Command
+Type your messages. Every AI response goes through the Output Gate before you see it.
 
-Scan a folder for potential sensitive data:
+**Chat commands:**
+- `/quit` — Exit the chat
+- `/clear` — Clear conversation history
+- `/gcs` — Show current governance compliance score
+
+### Workflow 3: Scan Files for Sensitive Data
+
+Find PII and secrets in your documents:
 
 ```bash
 agentkb scan --path ./my-documents
 ```
 
 **Output shows:**
-- Number of files scanned
-- PII patterns found (emails, phones, SSNs)
-- Secret patterns found (API keys, passwords)
-- Paths only — never shows actual content
+- Files scanned
+- PII found (emails, phones, SSNs) — counts only, not actual values
+- Secrets found (API keys, passwords) — counts only
+- File paths where issues were detected
 
-### Audit and Compliance Commands
+**Note:** Scan never displays the actual sensitive content, only that it exists.
+
+### Workflow 4: Run a Demo
+
+See the full governance flow in action:
 
 ```bash
-# Check governance compliance score
-agentkb gcs
+# With Ollama
+agentkb demo --ollama-model llama3.1:8b
 
-# Query audit logs (filter by time, action, decision)
+# Mock mode (no LLM needed, uses test responses)
+agentkb demo --mock
+```
+
+The demo shows:
+1. AI receives a prompt
+2. AI generates a response
+3. Output Gate catches violations
+4. You see the governed result
+
+---
+
+## Command Reference
+
+### Essential Commands
+
+| Command | What It Does | Example |
+|---------|--------------|---------|
+| `init` | Set up AgentKB in a folder | `agentkb init` |
+| `doctor` | Check if everything is working | `agentkb doctor` |
+| `gate` | Check text for violations | `agentkb gate --text "..."` |
+| `chat` | AI conversation with governance | `agentkb chat --ollama-model llama3.1:8b` |
+| `scan` | Find sensitive data in files | `agentkb scan --path ./docs` |
+| `demo` | See governance in action | `agentkb demo --mock` |
+
+### Monitoring Commands
+
+| Command | What It Does | Example |
+|---------|--------------|---------|
+| `gcs` | Show governance compliance score | `agentkb gcs` |
+| `audit` | View audit log of decisions | `agentkb audit --limit 20` |
+| `context` | Verify session integrity | `agentkb context` |
+
+### Gate Options
+
+```bash
+# Basic text check
+agentkb gate --text "Your message here"
+
+# Check a file
+agentkb gate --input document.txt
+
+# Get JSON output (for scripts/automation)
+agentkb gate --text "..." --format json
+
+# Auto-repair: try to fix violations automatically
+agentkb gate --text "..." --repair --max-retries 2
+
+# Dry-run: check without logging
+agentkb gate --text "..." --dry-run
+```
+
+### Audit Options
+
+```bash
+# Recent events
 agentkb audit --limit 50
-agentkb audit --action gate --decision block
-agentkb audit --start 2026-01-23T00:00:00Z
 
-# Verify context integrity
+# Only blocked items
+agentkb audit --decision block
+
+# Time range
+agentkb audit --start 2026-01-25T00:00:00Z
+
+# Export to JSON
+agentkb audit --format json > audit-report.json
+```
+
+---
+
+## Understanding Detection
+
+AgentKB uses a **3-tier detection system** to catch sensitive content:
+
+### Tier 1: Pattern Detection (Instant)
+
+Catches obvious patterns using Presidio (Microsoft's PII detection library):
+
+| Pattern | Example |
+|---------|---------|
+| Email addresses | `john@example.com` |
+| Phone numbers | `(555) 123-4567` |
+| Social Security Numbers | `123-45-6789` |
+| Credit card numbers | `4111-1111-1111-1111` |
+| IP addresses | `192.168.1.1` |
+
+**Speed:** ~1-5ms
+
+### Tier 2: Semantic Detection (Fast)
+
+Catches variations and context-aware patterns using AI embeddings:
+
+| What It Catches | Example |
+|-----------------|---------|
+| Disguised PII | `john [at] example [dot] com` |
+| Named entities in context | `Contact our CEO John Smith` |
+| Secret patterns | `the password is: hunter2` |
+
+**Speed:** ~10-50ms
+
+### Tier 3: LLM Evaluation (Optional)
+
+For novel cases, can use an LLM to evaluate if content violates governance.
+
+**Speed:** ~100-500ms (only used when needed)
+
+### Detection Output Explained
+
+When something is blocked, you'll see:
+
+```
+BLOCKED (1 violations)
+- sensitivity.levels.PII_INPUT_ONLY.output (high): External outputs must not include PII. Detected: EMAIL_ADDRESS(conf=0.95)
+
+Next steps:
+- Remove or generalize PII (e.g., replace with roles, not identifiers).
+```
+
+**Breaking this down:**
+- `sensitivity.levels.PII_INPUT_ONLY.output` — The rule that was violated
+- `(high)` — Severity level (low/medium/high/critical)
+- `EMAIL_ADDRESS(conf=0.95)` — What was detected and confidence (0-1)
+- `Next steps` — Actionable guidance
+
+---
+
+## Monitoring & Compliance
+
+### Governance Compliance Score (GCS)
+
+GCS is a 0-100 score measuring governance health:
+
+```bash
+agentkb gcs
+```
+
+**Output:**
+```
+GCS: 100/100
+Components:
+  - Governance loaded: ✓
+  - Session valid: ✓
+  - No critical violations: ✓
+  - Audit logging active: ✓
+```
+
+| Score | Meaning |
+|-------|---------|
+| 100 | Full compliance — everything working correctly |
+| 80-99 | Good — minor issues, system functional |
+| 50-79 | Warning — some governance gaps |
+| <50 | Critical — governance not enforced |
+
+### Audit Logs
+
+Every decision is logged. View your audit trail:
+
+```bash
+# Recent activity
+agentkb audit --limit 10
+
+# Only blocked items
+agentkb audit --decision block
+
+# Today's activity
+agentkb audit --start 2026-01-25T00:00:00Z
+```
+
+**Where are logs stored?**
+- `.agentkb/derived/audit_events.jsonl` — Machine-readable log
+- `.agentkb/derived/error_events.jsonl` — Violations and errors
+
+### Context Integrity
+
+Verify your session hasn't drifted:
+
+```bash
 agentkb context
 ```
+
+This checks:
+- Governance version matches what was loaded at session start
+- No unexpected changes to configuration
+- Time anchor is valid
 
 ---
 
@@ -364,106 +494,119 @@ agentkb context
 
 ### What "Working Correctly" Looks Like
 
-1. **`agentkb doctor` shows "Status: READY"** — No errors
+**1. Doctor shows READY:**
+```
+$ agentkb doctor
+AgentKB Doctor
+==============
+Governance: OK (v0.3.0)
+Derived dir: OK (writable)
+Status: READY
+```
 
-2. **Safe text passes through unchanged:**
-   ```
-   $ agentkb gate --text "The quarterly report shows 15% growth."
-   ALLOW
-   The quarterly report shows 15% growth.
-   ```
+**2. Clean text passes through:**
+```
+$ agentkb gate --text "The quarterly report shows 15% growth."
+ALLOW
+The quarterly report shows 15% growth.
+```
 
-3. **PII gets blocked with guidance:**
-   ```
-   $ agentkb gate --text "Contact me at john.doe@company.com"
-   BLOCKED (1 violations)
-   - sensitivity.levels.PII_INPUT_ONLY.output (high): External outputs must not include PII...
-   ```
+**3. PII is blocked with guidance:**
+```
+$ agentkb gate --text "Contact john.doe@company.com for details"
+BLOCKED (1 violations)
+- sensitivity.levels.PII_INPUT_ONLY.output (high): External outputs must not include PII. Detected: EMAIL_ADDRESS(conf=1.00)
 
-4. **Secrets trigger critical violations:**
-   ```
-   $ agentkb gate --text "My API key is sk-abc123..."
-   BLOCKED (1 violations)
-   - sensitivity.levels.SECRET.output (critical): External outputs must never include SECRET data.
-   ```
+Next steps:
+- Remove or generalize PII (e.g., replace with roles, not identifiers).
+```
 
-5. **Unsourced factual claims are flagged:**
-   ```
-   $ agentkb gate --text "Sales increased by exactly $5.2 million this quarter."
-   BLOCKED (1 violations)
-   - claims.output_tiers.external.require_evidence (high): EXTERNAL outputs require evidence for DERIVED claims.
-   ```
+**4. Secrets trigger critical blocks:**
+```
+$ agentkb gate --text "API key: sk-abc123def456"
+BLOCKED (1 violations)
+- sensitivity.levels.SECRET.output (critical): External outputs must never include SECRET data. Detected: SECRET_KEY(conf=0.90)
+```
 
-6. **Chat responses are filtered before you see them:**
-   - If the AI tries to output something sensitive, you see the redacted version
-   - Blocked attempts are logged to `.agentkb/derived/error_events.jsonl`
+**5. Unsourced claims are flagged:**
+```
+$ agentkb gate --text "Revenue increased by exactly $5.2 million."
+BLOCKED (1 violations)
+- claims.output_tiers.external.require_evidence (high): EXTERNAL outputs require evidence for DERIVED claims.
+
+Next steps:
+- Add source citation or rephrase as estimate/opinion.
+```
+
+**6. GCS shows full compliance when healthy:**
+```
+$ agentkb gcs
+GCS: 100/100
+```
 
 ---
 
 ## Troubleshooting
 
-### Installation Issues
+### Installation Problems
 
-**Problem:** `pip install` fails with "wheel not supported"
-- **Cause:** Wrong Python version or wrong platform wheel
-- **Fix:** Verify `python --version` shows 3.12.x; download correct wheel for your OS
+| Problem | Cause | Fix |
+|---------|-------|-----|
+| `pip install` fails with "wheel not supported" | Wrong Python version or platform | Check `python --version` is 3.12.x; download correct wheel |
+| `agentkb: command not found` | Scripts folder not in PATH | Use `python -m agentkb` instead |
+| Import errors after install | Corrupted installation | `pip uninstall agentkb` then reinstall |
 
-**Problem:** `agentkb: command not found`
-- **Cause:** Python scripts folder not in PATH
-- **Fix:** Try `python -m agentkb` instead, or add Python's Scripts folder to your PATH
+### Initialization Problems
 
-### Ollama Issues
+| Problem | Cause | Fix |
+|---------|-------|-----|
+| `Governance load failed` | Missing `.agentkb/` folder | Run `agentkb init` |
+| `Permission denied` | No write access to folder | Check folder permissions |
+| Config files corrupted | Manual edits broke YAML | Run `agentkb init --force` to reset |
 
-**Problem:** `agentkb chat` says "Failed to connect to Ollama"
-- **Cause:** Ollama service not running
-- **Fix:** 
-  - Windows: Check that Ollama is running in system tray
-  - macOS/Linux: Run `ollama serve` in a separate terminal
+### Ollama Problems
 
-**Problem:** "Model not found"
-- **Cause:** Model not downloaded
-- **Fix:** Run `ollama pull llama3.1:8b` (or your chosen model)
+| Problem | Cause | Fix |
+|---------|-------|-----|
+| "Failed to connect to Ollama" | Ollama not running | Windows: Check system tray. macOS/Linux: Run `ollama serve` |
+| "Model not found" | Model not downloaded | Run `ollama pull llama3.1:8b` |
+| Very slow responses | Model too large for hardware | Try `ollama pull llama3.2:3b` or `phi3:mini` |
+| Out of memory | Not enough RAM | Use smaller model or close other apps |
 
-**Problem:** Very slow responses
-- **Cause:** Model too large for your hardware
-- **Fix:** Try a smaller model: `ollama pull llama3.2:3b` or `phi3:mini`
+### API Key Problems
 
-### API Key Issues
+| Problem | Cause | Fix |
+|---------|-------|-----|
+| "API_KEY not set" | Environment variable missing | Set it: `$env:ANTHROPIC_API_KEY = "..."` (PowerShell) |
+| "Invalid API key" | Wrong/expired key | Generate new key from provider console |
+| "Rate limited" | Too many requests | Wait a few minutes, or upgrade API plan |
 
-**Problem:** "ANTHROPIC_API_KEY not set" (or similar)
-- **Cause:** Environment variable not set
-- **Fix:** Set the variable in your current terminal session (see [Setting Your API Key](#setting-your-api-key))
+### Gate Problems
 
-**Problem:** "Invalid API key" or "Authentication failed"
-- **Cause:** Wrong key, expired key, or key copied incorrectly
-- **Fix:** 
-  - Generate a new key from the provider's console
-  - Make sure you copied the entire key (no extra spaces)
-  - Check the key hasn't expired
+| Problem | Cause | Fix |
+|---------|-------|-----|
+| Blocks everything | Overly strict config (rare) | Check violation details; contact support |
+| Allows everything | Governance not loaded | Run `agentkb doctor` to verify |
+| Wrong detections | Detection false positive | Use `--format json` for details; report issue |
+| Slow response | Large text input | Split into smaller chunks |
 
-### Gate Issues
+### GCS Problems
 
-**Problem:** Gate blocks everything / too many false positives
-- **Cause:** Overly aggressive detection (rare in v0.5.0+)
-- **Fix:** 
-  - Check the specific violation reason in the output
-  - Use `--format json` for detailed violation info
-  - Contact us if patterns seem wrong
-
-**Problem:** Gate allows everything / nothing blocked
-- **Cause:** Governance files missing or corrupted
-- **Fix:** 
-  - Run `agentkb doctor` to check status
-  - Re-run `agentkb init --force` to regenerate config files
+| Problem | Cause | Fix |
+|---------|-------|-----|
+| GCS below 100 | Governance issues | Run `agentkb doctor` for details |
+| GCS shows 0 | Governance not initialized | Run `agentkb init` |
+| Can't query GCS | No audit data | Run some gate commands first |
 
 ### Common Error Messages
 
 | Error | Meaning | Fix |
 |-------|---------|-----|
-| `Governance load failed` | Missing `.agentkb/governance.yaml` | Run `agentkb init` |
-| `Unknown role` | Role name not in `roles.yaml` | Use default `reader` role or check spelling |
-| `LLM provider error` | API request failed | Check API key and internet connection |
-| `Session expired` | Chat session timed out | Start a new `agentkb chat` session |
+| `Governance load failed` | No `.agentkb/governance.yaml` | Run `agentkb init` |
+| `Unknown role` | Role not defined | Use `reader` (default) or check `.agentkb/roles.yaml` |
+| `LLM provider error` | API call failed | Check API key and internet |
+| `Session expired` | Chat session timed out | Start new `agentkb chat` |
+| `Context integrity violation` | Config changed mid-session | Restart your session |
 
 ---
 
@@ -471,16 +614,25 @@ agentkb context
 
 | Term | Meaning |
 |------|---------|
-| **Agent** | An AI system that performs tasks (like ChatGPT, Claude, etc.) |
-| **API Key** | A secret password that lets your code talk to cloud AI services |
-| **Governance** | Rules about what AI can and cannot do |
-| **LLM** | Large Language Model — the AI technology behind ChatGPT, Claude, etc. |
+| **Access Gate** | [Phase 3] RBAC filter controlling what agent can read |
+| **Agent** | An AI system that performs tasks (ChatGPT, Claude, etc.) |
+| **API Key** | Secret credential for accessing cloud AI services |
+| **Audit Log** | Record of all gate decisions for compliance |
+| **GCS** | Governance Compliance Score — 0-100 health metric |
+| **Governance** | Structural rules defining what AI can and cannot output |
+| **Gov-Compliant** | Text that passes all governance rules |
+| **Gov-Noncompliant** | Text that violates one or more governance rules |
+| **LLM** | Large Language Model — the AI technology behind ChatGPT, Claude |
 | **Ollama** | Software that runs AI models locally on your computer |
-| **Output Gate** | AgentKB's filter that checks AI responses for policy violations |
-| **PII** | Personally Identifiable Information — names, emails, SSNs, phone numbers |
-| **RBAC** | Role-Based Access Control — different users/agents have different permissions |
-| **Redaction** | Replacing sensitive text with placeholders like `<REDACTED:PII>` |
-| **Wheel** | A pre-built Python package file (`.whl` extension) |
+| **Output Gate** | AgentKB's filter that checks responses for violations |
+| **PII** | Personally Identifiable Information — emails, SSNs, phone numbers |
+| **Presidio** | Microsoft's open-source PII detection library (used in Tier 1) |
+| **RBAC** | Role-Based Access Control — different permissions per role |
+| **Redaction** | Replacing sensitive text with placeholders like `<REDACTED>` |
+| **Semantic Detection** | AI-powered detection that understands meaning, not just patterns |
+| **Tool Gate** | [Phase 3] Filter controlling agent tool invocations (APIs, HTTP) |
+| **Violation** | When text breaks a governance rule |
+| **Wheel** | Pre-built Python package file (`.whl` extension) |
 
 ---
 
