@@ -84,17 +84,17 @@ Go to [GitHub Releases](https://github.com/j-w-code/AgentKB-public/releases) and
 
 | Your Computer | Download File |
 |---------------|---------------|
-| Windows 64-bit | `agentkb-0.4.10-cp312-cp312-win_amd64.whl` |
-| Linux 64-bit | `agentkb-0.4.10-cp312-cp312-manylinux_2_17_x86_64.whl` |
-| macOS Intel | `agentkb-0.4.10-cp312-cp312-macosx_10_13_x86_64.whl` |
-| macOS Apple Silicon | `agentkb-0.4.10-cp312-cp312-macosx_11_0_arm64.whl` |
+| Windows 64-bit | `agentkb-0.5.0-cp312-cp312-win_amd64.whl` |
+| Linux 64-bit | `agentkb-0.5.0-cp312-cp312-manylinux_2_17_x86_64.whl` |
+| macOS Intel | `agentkb-0.5.0-cp312-cp312-macosx_10_13_x86_64.whl` |
+| macOS Apple Silicon | `agentkb-0.5.0-cp312-cp312-macosx_11_0_arm64.whl` |
 
 ### Step 2: Install the Wheel
 
 Open your terminal, navigate to where you downloaded the file, and run:
 
 ```bash
-pip install agentkb-0.4.10-cp312-cp312-win_amd64.whl
+pip install agentkb-0.5.0-cp312-cp312-win_amd64.whl
 ```
 
 (Replace the filename with the one you downloaded)
@@ -107,7 +107,7 @@ pip install agentkb-0.4.10-cp312-cp312-win_amd64.whl
 agentkb --version
 ```
 
-**Expected output:** `agentkb 0.4.10` (or similar)
+**Expected output:** `agentkb 0.5.0` (or similar)
 
 If you see `command not found`, try:
 ```bash
@@ -444,7 +444,7 @@ agentkb context
 ### Gate Issues
 
 **Problem:** Gate blocks everything / too many false positives
-- **Cause:** Overly aggressive detection (rare in v0.4.10+)
+- **Cause:** Overly aggressive detection (rare in v0.5.0+)
 - **Fix:** 
   - Check the specific violation reason in the output
   - Use `--format json` for detailed violation info

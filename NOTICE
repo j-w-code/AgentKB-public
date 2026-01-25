@@ -11,7 +11,7 @@ SUMMARY:
 - Production use requires a commercial license
 
 CURRENT STATE:
-Phase 1-2 is publicly available as compiled binary wheels (v0.4.10).
+Phase 1-2.7 is publicly available as compiled binary wheels (v0.5.0).
 Download from GitHub Releases. Source available under commercial license.
 
 For licensing inquiries or partnership discussions:
