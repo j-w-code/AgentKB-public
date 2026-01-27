@@ -99,19 +99,30 @@ AgentKB governance primitives align with:
 
 ## Current Status
 
-> ✅ **Phase 1-2.7 Public Release** (v0.5.0)
+> ✅ **Phase 1-2.9.5 Public Release** (v0.5.1)
 
 | Phase | Focus | Status |
 |-------|-------|--------|
 | **Phase 1** | Output Gate MVP | ✅ Complete |
 | **Phase 2** | Audit + GCS + Evidence | ✅ Complete |
 | **Phase 2.5-2.7** | Structural Enforcement (3-tier detection, Audit Bus) | ✅ Complete |
-| **Phase 3** | Access Control (RBAC enforcement) | 📋 Planned |
+| **Phase 2.9** | Foundation Hardening (adversarial tests, locale patterns) | ✅ Complete |
+| **Phase 2.9.5** | Four Operational Modes (gate independence) | ✅ Complete |
+| **Phase 3** | Access Control (RBAC enforcement) | 📋 Next |
 | **Phase 4** | Enterprise (IdP, SDKs, Dashboard) | 📋 Planned |
 
-**Test Coverage:** 675 tests passing • 67% code coverage • GCS 100
+### What's New in v0.5.1
 
-**Available now:** CLI, REST API, MCP server, multi-provider LLM support.
+- **Four Operational Modes**: FULL, SOLO-OG, SOLO-AG, ISLAND — gates can operate independently
+- **AccessGate primitive**: Input validation with nested ToolInvocationGate
+- **Audit metrics API**: Structured metrics (blocks/day, rule coverage)
+- **Locale-aware PII**: Regional pattern configurations
+- **Adversarial test corpus**: Encoding attacks, prompt injection, tool exfiltration
+- **E2E benchmark**: p95 latency 78.6ms (NFR: <3000ms)
+
+**Test Coverage:** 662 tests passing • 67% code coverage • GCS 100
+
+**Available now:** CLI (16 commands), REST API (8 endpoints), MCP server (3 tools), multi-provider LLM support.
 
 ---
 
@@ -132,7 +143,7 @@ Download the wheel for your platform from [GitHub Releases](https://github.com/j
 Then install:
 
 ```bash
-pip install agentkb-0.5.0-cp312-cp312-<your-platform>.whl
+pip install agentkb-0.5.1-cp312-cp312-<your-platform>.whl
 ```
 
 ### Quick Start
