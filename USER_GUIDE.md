@@ -2,7 +2,7 @@
 
 **For complete beginners.** This guide assumes no prior experience with Python packages, AI APIs, or AgentKB.
 
-**Version:** 0.5.0 (Phase 2.7)
+**Version:** 0.5.1 (Phase 2.9.5)
 
 ---
 
@@ -16,10 +16,11 @@
 6. [Core Workflows](#core-workflows)
 7. [Command Reference](#command-reference)
 8. [Understanding Detection](#understanding-detection)
-9. [Monitoring & Compliance](#monitoring--compliance)
-10. [Expected Behavior](#expected-behavior)
-11. [Troubleshooting](#troubleshooting)
-12. [Glossary](#glossary)
+9. [Operational Modes](#operational-modes)
+10. [Monitoring & Compliance](#monitoring--compliance)
+11. [Expected Behavior](#expected-behavior)
+12. [Troubleshooting](#troubleshooting)
+13. [Glossary](#glossary)
 
 ---
 
@@ -35,6 +36,7 @@ AgentKB is a **governance layer** for AI agents. Think of it as a compliance fil
 | **Validates claims** | Flags statistics and facts that don't have sources |
 | **Logs everything** | Creates audit trail of what was allowed and blocked |
 | **Scores compliance** | Gives you a governance "health score" (GCS) |
+| **Operates independently** | Gates can run solo if siblings are unhealthy |
 
 ### What It Does NOT Do
 
@@ -42,15 +44,15 @@ AgentKB is a **governance layer** for AI agents. Think of it as a compliance fil
 - **Doesn't send data to the cloud** — Everything runs locally on your machine
 - **Doesn't require internet** — Works fully offline with local AI (Ollama)
 
-### The Big Picture
+### The Architecture
 
 ```
            KNOWLEDGE BASE
                  │
                  ▼
     ┌────────────────────────┐
-    │      ACCESS GATE       │ ← RBAC: What agent can READ
-    │      (Phase 3)         │   [FUTURE]
+    │      ACCESS GATE       │ ← Input validation + RBAC
+    │      ✓ Phase 2.9.5     │   Permission checks, prompt injection defense
     └────────────────────────┘
                  │
                  ▼
@@ -60,8 +62,8 @@ AgentKB is a **governance layer** for AI agents. Think of it as a compliance fil
            ▼         ▼
     ┌───────────┐  ┌───────────────────┐
     │ TOOL GATE │  │    OUTPUT GATE    │ ← What agent can DISCLOSE
-    │ (Phase 3) │  │   ✓ AVAILABLE     │   [CURRENT]
-    │ [FUTURE]  │  └───────────────────┘
+    │ ✓ Nested  │  │   ✓ Phase 1-2     │   PII/secret/claim validation
+    │ in Access │  └───────────────────┘
     └───────────┘            │
          │                   ▼
          ▼            Governed output
@@ -69,7 +71,7 @@ AgentKB is a **governance layer** for AI agents. Think of it as a compliance fil
     & Services
 ```
 
-**Current State (v0.5.0):** Output Gate is fully operational. Access Gate and Tool Gate are planned for Phase 3.
+**v0.5.1 State:** Output Gate fully operational. Access Gate with nested Tool Gate operational. Content-layer RBAC enforcement planned for Phase 3.
 
 ---
 
@@ -114,17 +116,17 @@ Go to [GitHub Releases](https://github.com/j-w-code/AgentKB-public/releases) and
 
 | Your Computer | Download File |
 |---------------|---------------|
-| Windows 64-bit | `agentkb-0.5.0-cp312-cp312-win_amd64.whl` |
-| Linux 64-bit | `agentkb-0.5.0-cp312-cp312-manylinux_2_17_x86_64.whl` |
-| macOS Intel | `agentkb-0.5.0-cp312-cp312-macosx_10_13_x86_64.whl` |
-| macOS Apple Silicon | `agentkb-0.5.0-cp312-cp312-macosx_11_0_arm64.whl` |
+| Windows 64-bit | `agentkb-0.5.1-cp312-cp312-win_amd64.whl` |
+| Linux 64-bit | `agentkb-0.5.1-cp312-cp312-manylinux_2_17_x86_64.whl` |
+| macOS Intel | `agentkb-0.5.1-cp312-cp312-macosx_10_13_x86_64.whl` |
+| macOS Apple Silicon | `agentkb-0.5.1-cp312-cp312-macosx_11_0_arm64.whl` |
 
 ### Step 2: Install
 
 Navigate to your Downloads folder and run:
 
 ```bash
-pip install agentkb-0.5.0-cp312-cp312-win_amd64.whl
+pip install agentkb-0.5.1-cp312-cp312-win_amd64.whl
 ```
 
 (Replace filename with the one you downloaded)
@@ -135,7 +137,7 @@ pip install agentkb-0.5.0-cp312-cp312-win_amd64.whl
 agentkb --version
 ```
 
-**Expected:** `agentkb 0.5.0`
+**Expected:** `agentkb 0.5.1`
 
 **If you see "command not found":**
 ```bash
@@ -313,6 +315,26 @@ The demo shows:
 3. Output Gate catches violations
 4. You see the governed result
 
+### Workflow 5: Review Audit Metrics
+
+Get aggregate statistics on governance events:
+
+```bash
+agentkb audit metrics
+```
+
+Shows blocks/day, rule coverage, event counts, and trends.
+
+### Workflow 6: Run Adversarial Tests
+
+Test your gate against known attack patterns:
+
+```bash
+agentkb adversarial
+```
+
+Runs encoding attacks, prompt injection attempts, and tool exfiltration tests against your gate configuration.
+
 ---
 
 ## Command Reference
@@ -334,7 +356,26 @@ The demo shows:
 |---------|--------------|---------|
 | `gcs` | Show governance compliance score | `agentkb gcs` |
 | `audit` | View audit log of decisions | `agentkb audit --limit 20` |
+| `audit metrics` | Aggregate audit statistics | `agentkb audit metrics` |
+| `audit-bus` | Check Audit Bus health | `agentkb audit-bus status` |
 | `context` | Verify session integrity | `agentkb context` |
+
+### Testing Commands
+
+| Command | What It Does | Example |
+|---------|--------------|---------|
+| `replay` | Run regression fixtures | `agentkb replay` |
+| `adversarial` | Run attack pattern tests | `agentkb adversarial` |
+| `bench` | Performance benchmarks | `agentkb bench` |
+
+### Learning Commands (Tier 2 Detection)
+
+| Command | What It Does | Example |
+|---------|--------------|---------|
+| `learn status` | Check semantic learning state | `agentkb learn` |
+| `learn list` | Show pending specifics | `agentkb learn list` |
+| `learn confirm` | Confirm a detection | `agentkb learn confirm <class_id> <hash>` |
+| `learn reject` | Reject false positive | `agentkb learn reject <class_id> <hash>` |
 
 ### Gate Options
 
@@ -352,7 +393,7 @@ agentkb gate --text "..." --format json
 agentkb gate --text "..." --repair --max-retries 2
 
 # Dry-run: check without logging
-agentkb gate --text "..." --dry-run
+agentkb gate --text "..." --no-log
 ```
 
 ### Audit Options
@@ -369,6 +410,9 @@ agentkb audit --start 2026-01-25T00:00:00Z
 
 # Export to JSON
 agentkb audit --format json > audit-report.json
+
+# Aggregate metrics
+agentkb audit metrics --format json
 ```
 
 ---
@@ -400,8 +444,11 @@ Catches variations and context-aware patterns using AI embeddings:
 | Disguised PII | `john [at] example [dot] com` |
 | Named entities in context | `Contact our CEO John Smith` |
 | Secret patterns | `the password is: hunter2` |
+| Verbal descriptions | `My social is one two three...` |
 
 **Speed:** ~10-50ms
+
+**22 Reference Classes:** SSN verbal, email obfuscated, phone verbal, address partial, DOB verbal, name relationship, ID partial, medical verbal, card partial, bank verbal, crypto address, income disclosure, API key verbal, password hint, key prefix, connection string, token describe, MFA backup, employer detail, location precise, schedule pattern, travel plan.
 
 ### Tier 3: LLM Evaluation (Optional)
 
@@ -426,6 +473,65 @@ Next steps:
 - `(high)` — Severity level (low/medium/high/critical)
 - `EMAIL_ADDRESS(conf=0.95)` — What was detected and confidence (0-1)
 - `Next steps` — Actionable guidance
+
+---
+
+## Operational Modes
+
+AgentKB v0.5.1 introduces **four operational modes** for gate resilience. Gates can operate independently when siblings are unhealthy.
+
+### FULL Mode
+
+Both Access Gate and Output Gate are healthy and can cross-verify.
+
+```
+$ agentkb doctor
+Gates: OK (mode=full)
+```
+
+- Complete cross-verification via Audit Bus
+- Provenance tracking between gates
+- Normal operation
+
+### SOLO-OG Mode (Output Gate Solo)
+
+Output Gate operates independently when Access Gate is unhealthy.
+
+```
+$ agentkb doctor
+Gates: DEGRADED (mode=solo-og, degraded=[access_gate])
+```
+
+- Output Gate runs full 3-tier detection
+- Events include `degraded_flag: true`
+- User experience: Normal output, degraded state logged
+
+### SOLO-AG Mode (Access Gate Solo)
+
+Access Gate operates independently when Output Gate is unhealthy.
+
+```
+$ agentkb doctor
+Gates: DEGRADED (mode=solo-ag, degraded=[output_gate])
+```
+
+- Access Gate validates input, grants access
+- Tool invocation checks still active
+- User experience: May see degraded flag warnings
+
+### ISLAND Mode
+
+Both gates healthy but cannot coordinate (network partition).
+
+- Both gates operate solo
+- Both perspectives captured for post-incident reconstruction
+- Rare edge case
+
+### Default Behavior
+
+AgentKB uses **SOLO_FALLBACK** by default: availability with visibility over strict fail-closed. Gates continue operating when siblings are unhealthy, with degraded state logged for audit.
+
+For strict environments requiring fail-closed on any gate failure, this can be configured programmatically.
 
 ---
 
@@ -468,12 +574,29 @@ agentkb audit --limit 10
 agentkb audit --decision block
 
 # Today's activity
-agentkb audit --start 2026-01-25T00:00:00Z
+agentkb audit --start 2026-01-27T00:00:00Z
+
+# Aggregate metrics
+agentkb audit metrics
 ```
 
 **Where are logs stored?**
 - `.agentkb/derived/audit_events.jsonl` — Machine-readable log
 - `.agentkb/derived/error_events.jsonl` — Violations and errors
+
+### Audit Metrics (v0.5.1)
+
+Get aggregate statistics:
+
+```bash
+agentkb audit metrics
+```
+
+Shows:
+- Blocks per day
+- Rule coverage (which rules triggered)
+- Event counts by type
+- Trends over time
 
 ### Context Integrity
 
@@ -488,19 +611,34 @@ This checks:
 - No unexpected changes to configuration
 - Time anchor is valid
 
+### Gate Health
+
+Check operational mode and gate status:
+
+```bash
+agentkb doctor
+```
+
+Shows:
+- Governance status
+- Gate health (access_gate, output_gate)
+- Operational mode (full, solo-og, solo-ag, island)
+- Degraded gates if any
+
 ---
 
 ## Expected Behavior
 
 ### What "Working Correctly" Looks Like
 
-**1. Doctor shows READY:**
+**1. Doctor shows READY with gate status:**
 ```
 $ agentkb doctor
 AgentKB Doctor
 ==============
-Governance: OK (v0.3.0)
+Governance: OK (v0.3.7)
 Derived dir: OK (writable)
+Gates: OK (mode=full)
 Status: READY
 ```
 
@@ -542,6 +680,12 @@ Next steps:
 ```
 $ agentkb gcs
 GCS: 100/100
+```
+
+**7. Degraded mode is visible when gates are unhealthy:**
+```
+$ agentkb doctor
+Gates: DEGRADED (mode=solo-og, degraded=[access_gate])
 ```
 
 ---
@@ -589,6 +733,7 @@ GCS: 100/100
 | Allows everything | Governance not loaded | Run `agentkb doctor` to verify |
 | Wrong detections | Detection false positive | Use `--format json` for details; report issue |
 | Slow response | Large text input | Split into smaller chunks |
+| Degraded mode | Sibling gate unhealthy | Check `agentkb doctor` for details |
 
 ### GCS Problems
 
@@ -607,6 +752,7 @@ GCS: 100/100
 | `LLM provider error` | API call failed | Check API key and internet |
 | `Session expired` | Chat session timed out | Start new `agentkb chat` |
 | `Context integrity violation` | Config changed mid-session | Restart your session |
+| `Gate unhealthy` | Sibling gate not responding | Check logs; system continues in solo mode |
 
 ---
 
@@ -614,23 +760,27 @@ GCS: 100/100
 
 | Term | Meaning |
 |------|---------|
-| **Access Gate** | [Phase 3] RBAC filter controlling what agent can read |
+| **Access Gate** | Input validation + RBAC filter controlling what agent can read |
 | **Agent** | An AI system that performs tasks (ChatGPT, Claude, etc.) |
 | **API Key** | Secret credential for accessing cloud AI services |
+| **Audit Bus** | Event coordination layer for gate-to-gate communication |
 | **Audit Log** | Record of all gate decisions for compliance |
+| **Degraded Mode** | Gate operating independently when sibling is unhealthy |
 | **GCS** | Governance Compliance Score — 0-100 health metric |
 | **Governance** | Structural rules defining what AI can and cannot output |
 | **Gov-Compliant** | Text that passes all governance rules |
 | **Gov-Noncompliant** | Text that violates one or more governance rules |
 | **LLM** | Large Language Model — the AI technology behind ChatGPT, Claude |
 | **Ollama** | Software that runs AI models locally on your computer |
+| **Operational Mode** | Current gate coordination state (full, solo-og, solo-ag, island) |
 | **Output Gate** | AgentKB's filter that checks responses for violations |
 | **PII** | Personally Identifiable Information — emails, SSNs, phone numbers |
 | **Presidio** | Microsoft's open-source PII detection library (used in Tier 1) |
 | **RBAC** | Role-Based Access Control — different permissions per role |
 | **Redaction** | Replacing sensitive text with placeholders like `<REDACTED>` |
 | **Semantic Detection** | AI-powered detection that understands meaning, not just patterns |
-| **Tool Gate** | [Phase 3] Filter controlling agent tool invocations (APIs, HTTP) |
+| **SOLO_FALLBACK** | Default behavior where gates continue operating when siblings fail |
+| **Tool Gate** | Filter controlling agent tool invocations (nested in Access Gate) |
 | **Violation** | When text breaks a governance rule |
 | **Wheel** | Pre-built Python package file (`.whl` extension) |
 
