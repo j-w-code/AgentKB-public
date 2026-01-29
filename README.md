@@ -116,13 +116,16 @@ AgentKB governance primitives align with:
 ### What's New in v0.5.1
 
 - **Four Operational Modes**: FULL, SOLO-OG, SOLO-AG, ISLAND — gates can operate independently
+- **GCS Matrix**: Unified compliance structure with two temporal dimensions:
+  - *Violation History* (PRE-session): Historical compliance score gates session start
+  - *Integration State* (WITHIN-session): Runtime verification prevents context drift, truncation, and deflection
 - **AccessGate primitive**: Input validation with nested ToolInvocationGate
 - **Audit metrics API**: Structured metrics (blocks/day, rule coverage)
 - **Locale-aware PII**: Regional pattern configurations
 - **Adversarial test corpus**: Encoding attacks, prompt injection, tool exfiltration
 - **E2E benchmark**: p95 latency 78.6ms (NFR: <3000ms)
 
-**Test Coverage:** 662 tests passing • 67% code coverage • GCS 100
+**Test Coverage:** 673 tests passing • 67% code coverage • GCS 100
 
 **Available now:** CLI (16 commands), REST API (8 endpoints), MCP server (3 tools), multi-provider LLM support.
 

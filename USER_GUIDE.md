@@ -1,796 +1,744 @@
-# AgentKB User Guide
+# AgentKB CLI User Guide (MVP)
 
-**For complete beginners.** This guide assumes no prior experience with Python packages, AI APIs, or AgentKB.
+## Scope
+This guide covers the **local CLI MVP** focused on core governance enforcement:
+- **Init Gate**: governance must load before anything runs.
+- **Output Gate**: policy enforcement on agent outputs (PII, secrets, claims).
+- **Closed-loop seed**: blocked outputs append `error_event.v1` records (JSONL).
 
-**Version:** 0.5.1 (Phase 2.9.5)
+Optional integration layer (covered elsewhere):
+- REST API server: `docs/api_reference.md`
+- MCP server: `docs/mcp_integration.md`
 
----
+Out of scope (by design): retrieval/RAG, vector DBs, dashboards.
 
-## Table of Contents
-
-1. [What is AgentKB?](#what-is-agentkb)
-2. [Prerequisites](#prerequisites)
-3. [Installation](#installation)
-4. [Quick Start (5 Minutes)](#quick-start-5-minutes)
-5. [Setting Up Your LLM](#setting-up-your-llm)
-6. [Core Workflows](#core-workflows)
-7. [Command Reference](#command-reference)
-8. [Understanding Detection](#understanding-detection)
-9. [Operational Modes](#operational-modes)
-10. [Monitoring & Compliance](#monitoring--compliance)
-11. [Expected Behavior](#expected-behavior)
-12. [Troubleshooting](#troubleshooting)
-13. [Glossary](#glossary)
-
----
-
-## What is AgentKB?
-
-AgentKB is a **governance layer** for AI agents. Think of it as a compliance filter that reviews everything an AI reads and writes.
-
-### What It Does
-
-| Protection | How It Works |
-|------------|--------------|
-| **Blocks sensitive data** | Catches PII (emails, SSNs, phone numbers), passwords, API keys |
-| **Validates claims** | Flags statistics and facts that don't have sources |
-| **Logs everything** | Creates audit trail of what was allowed and blocked |
-| **Scores compliance** | Gives you a governance "health score" (GCS) |
-| **Operates independently** | Gates can run solo if siblings are unhealthy |
-
-### What It Does NOT Do
-
-- **Doesn't replace your AI** — Works alongside ChatGPT, Claude, Ollama, etc.
-- **Doesn't send data to the cloud** — Everything runs locally on your machine
-- **Doesn't require internet** — Works fully offline with local AI (Ollama)
-
-### The Architecture
-
-```
-           KNOWLEDGE BASE
-                 │
-                 ▼
-    ┌────────────────────────┐
-    │      ACCESS GATE       │ ← Input validation + RBAC
-    │      ✓ Phase 2.9.5     │   Permission checks, prompt injection defense
-    └────────────────────────┘
-                 │
-                 ▼
-              AGENT
-           ┌────┴────┐
-           │         │
-           ▼         ▼
-    ┌───────────┐  ┌───────────────────┐
-    │ TOOL GATE │  │    OUTPUT GATE    │ ← What agent can DISCLOSE
-    │ ✓ Nested  │  │   ✓ Phase 1-2     │   PII/secret/claim validation
-    │ in Access │  └───────────────────┘
-    └───────────┘            │
-         │                   ▼
-         ▼            Governed output
-    External APIs          to you
-    & Services
-```
-
-**v0.5.1 State:** Output Gate fully operational. Access Gate with nested Tool Gate operational. Content-layer RBAC enforcement planned for Phase 3.
-
----
-
-## Prerequisites
-
-### 1. Python 3.12
-
-AgentKB requires Python 3.12 specifically.
-
-**Check your version:**
-```bash
-python --version
-```
-
-**Expected:** `Python 3.12.x` (any 3.12 version works)
-
-**Need Python 3.12?**
-- **Windows:** Download from [python.org](https://www.python.org/downloads/) — choose Python 3.12.x
-- **macOS:** `brew install python@3.12` (with Homebrew)
-- **Linux:** `sudo apt install python3.12` (Ubuntu/Debian)
-
-### 2. pip (Comes with Python)
-
-Verify it works:
-```bash
-pip --version
-```
-
-### 3. A Terminal
-
-- **Windows:** PowerShell (recommended) or Command Prompt
-- **macOS:** Terminal
-- **Linux:** Any terminal
-
----
-
-## Installation
-
-### Step 1: Download
-
-Go to [GitHub Releases](https://github.com/j-w-code/AgentKB-public/releases) and download the wheel for your platform:
-
-| Your Computer | Download File |
-|---------------|---------------|
-| Windows 64-bit | `agentkb-0.5.1-cp312-cp312-win_amd64.whl` |
-| Linux 64-bit | `agentkb-0.5.1-cp312-cp312-manylinux_2_17_x86_64.whl` |
-| macOS Intel | `agentkb-0.5.1-cp312-cp312-macosx_10_13_x86_64.whl` |
-| macOS Apple Silicon | `agentkb-0.5.1-cp312-cp312-macosx_11_0_arm64.whl` |
-
-### Step 2: Install
-
-Navigate to your Downloads folder and run:
+## Install
 
 ```bash
-pip install agentkb-0.5.1-cp312-cp312-win_amd64.whl
+pip install agentkb
+# Or from source:
+# python -m pip install -e ".[dev]"
 ```
 
-(Replace filename with the one you downloaded)
+If you want LLM-in-the-loop:
+- Install and run **Ollama** locally.
 
-### Step 3: Verify
+## Validate (mirrors CI)
+AgentKB has a single canonical validation gate:
 
 ```bash
-agentkb --version
+python scripts/validate.py --repo-root .
 ```
 
-**Expected:** `agentkb 0.5.1`
+This runs (in order):
+- Ruff (lint)
+- Ruff (format check)
+- Unit tests
+- Session start smoke (`agentkb session start --profile build`) — **Note:** `session start` is a builder tool for CI validation, not a runtime user command
+- Bandit (security scan)
+- Boundary lint (process/product firewall)
 
-**If you see "command not found":**
+CI installs dependencies using a pinned constraints lock:
+- `constraints/ci.txt`
+
+To run locally with CI-parity pins:
+
 ```bash
-python -m agentkb --version
+python -m pip install -e ".[dev]" -c constraints/ci.txt
+python scripts/validate.py --repo-root .
 ```
 
----
+CI also runs a secrets scan using gitleaks + `.gitleaks.toml`. Local gitleaks runs are optional.
 
-## Quick Start (5 Minutes)
-
-Get AgentKB running in 4 commands:
+### Refreshing the CI lock (maintainers)
+Refresh `constraints/ci.txt` only when you intend to update the pinned toolchain (scheduled maintenance, or to fix CI after an upstream break).
 
 ```bash
-# 1. Create a project folder
-mkdir my-project && cd my-project
+python -m pip install -e ".[lock]"
+python -m piptools compile pyproject.toml --extra dev --extra perf --output-file constraints/ci.txt --resolver backtracking
+```
 
-# 2. Initialize AgentKB
+After refreshing, rerun `python scripts/validate.py --repo-root .` and commit the updated lock.
+
+## Quick start
+
+### 1. Initialize workspace (new users)
+
+```bash
 agentkb init
+```
 
-# 3. Check everything is working
+This creates `.agentkb/` with minimal governance files. Skip if you already have `.agentkb/governance.yaml`.
+
+### 2. Verify workspace
+
+```bash
 agentkb doctor
-
-# 4. Test the output gate
-agentkb gate --text "My email is test@example.com"
 ```
 
-**What you should see:**
+### 3. Session start (builders only)
 
-```
-BLOCKED (1 violations)
-- sensitivity.levels.PII_INPUT_ONLY.output (high): External outputs must not include PII. Detected: EMAIL_ADDRESS
+**Note:** `agentkb session start` is for agents building the AgentKB codebase, not end users.
 
-Next steps:
-- Remove or generalize PII (e.g., replace with roles, not identifiers).
-```
-
-**Congratulations!** AgentKB just prevented accidental exposure of an email address.
-
----
-
-## Setting Up Your LLM
-
-AgentKB can govern AI conversations. You have two options:
-
-### Option A: Local AI with Ollama (Recommended)
-
-**Ollama** runs AI models directly on your computer. Free, private, works offline.
-
-#### Install Ollama
-
-Download from [ollama.com](https://ollama.com/download) and run the installer.
-
-#### Download a Model
+**Note:** `agentkb session start` is a builder tool for agents working on the AgentKB codebase. End-users deploying AgentKB do not use this command.
 
 ```bash
-ollama pull llama3.1:8b
+agentkb session start --profile build
 ```
 
-This downloads a ~4GB model. Takes 5-15 minutes.
-
-**Smaller alternatives:**
-- `ollama pull llama3.2:3b` — Faster, ~2GB
-- `ollama pull phi3:mini` — Very fast, ~1.7GB
-
-#### Verify It's Running
+JSON mode (recommended for tooling / downstream builder agents):
 
 ```bash
-ollama list
+agentkb session start --profile build --format json
 ```
 
-You should see your downloaded model.
+Notes:
+- This emits the resolved load order from `session.yaml` and a fresh time anchor.
+- Treat **resume as governed**: after long idle (overnight), rerun `agentkb session start` to re-anchor time.
 
----
-
-### Option B: Cloud AI (Anthropic, OpenAI, xAI)
-
-Requires internet, an account, and an API key.
-
-| Provider | Environment Variable | Get Key |
-|----------|---------------------|---------|
-| Anthropic (Claude) | `ANTHROPIC_API_KEY` | [console.anthropic.com](https://console.anthropic.com/) |
-| OpenAI (GPT-4) | `OPENAI_API_KEY` | [platform.openai.com](https://platform.openai.com/api-keys) |
-| xAI (Grok) | `XAI_API_KEY` | [console.x.ai](https://console.x.ai/) |
-
-#### Set Your API Key
-
-**Windows (PowerShell):**
-```powershell
-$env:ANTHROPIC_API_KEY = "sk-ant-your-key-here"
-```
-
-**macOS/Linux:**
-```bash
-export ANTHROPIC_API_KEY="sk-ant-your-key-here"
-```
-
-**Important:** Never share your API key or commit it to version control.
-
----
-
-## Core Workflows
-
-### Workflow 1: Check Text Before Sending
-
-Use the gate to validate any text:
+3) Demo (LLM-in-the-loop, gated):
 
 ```bash
-# Check a message
-agentkb gate --text "Please contact john.smith@company.com for details"
-
-# Check a file
-agentkb gate --input draft-email.txt
-
-# Check from clipboard/pipe
-echo "Some text" | agentkb gate
-```
-
-**Possible outcomes:**
-- `ALLOW` — Text is compliant, no violations
-- `BLOCKED` — Violations found, with guidance on how to fix
-
-### Workflow 2: Governed AI Chat
-
-Have a conversation where every AI response is checked:
-
-```bash
-# With Ollama (local)
-agentkb chat --ollama-model llama3.1:8b
-
-# With Anthropic (cloud)
-agentkb chat --llm anthropic --llm-model claude-3-5-sonnet-20241022
-
-# With OpenAI (cloud)
-agentkb chat --llm openai --llm-model gpt-4o
-```
-
-Type your messages. Every AI response goes through the Output Gate before you see it.
-
-**Chat commands:**
-- `/quit` — Exit the chat
-- `/clear` — Clear conversation history
-- `/gcs` — Show current governance compliance score
-
-### Workflow 3: Scan Files for Sensitive Data
-
-Find PII and secrets in your documents:
-
-```bash
-agentkb scan --path ./my-documents
-```
-
-**Output shows:**
-- Files scanned
-- PII found (emails, phones, SSNs) — counts only, not actual values
-- Secrets found (API keys, passwords) — counts only
-- File paths where issues were detected
-
-**Note:** Scan never displays the actual sensitive content, only that it exists.
-
-### Workflow 4: Run a Demo
-
-See the full governance flow in action:
-
-```bash
-# With Ollama
 agentkb demo --ollama-model llama3.1:8b
-
-# Mock mode (no LLM needed, uses test responses)
-agentkb demo --mock
 ```
 
-The demo shows:
-1. AI receives a prompt
-2. AI generates a response
-3. Output Gate catches violations
-4. You see the governed result
-
-### Workflow 5: Review Audit Metrics
-
-Get aggregate statistics on governance events:
+4) Gate any draft:
 
 ```bash
-agentkb audit metrics
+cat draft.txt | agentkb gate
 ```
 
-Shows blocks/day, rule coverage, event counts, and trends.
-
-### Workflow 6: Run Adversarial Tests
-
-Test your gate against known attack patterns:
+5) Auto-repair blocked drafts (LLM rewrites + retries):
 
 ```bash
-agentkb adversarial
+cat draft.txt | agentkb gate --repair --max-retries 2
 ```
 
-Runs encoding attacks, prompt injection attempts, and tool exfiltration tests against your gate configuration.
-
----
-
-## Command Reference
-
-### Essential Commands
-
-| Command | What It Does | Example |
-|---------|--------------|---------|
-| `init` | Set up AgentKB in a folder | `agentkb init` |
-| `doctor` | Check if everything is working | `agentkb doctor` |
-| `gate` | Check text for violations | `agentkb gate --text "..."` |
-| `chat` | AI conversation with governance | `agentkb chat --ollama-model llama3.1:8b` |
-| `scan` | Find sensitive data in files | `agentkb scan --path ./docs` |
-| `demo` | See governance in action | `agentkb demo --mock` |
-
-### Monitoring Commands
-
-| Command | What It Does | Example |
-|---------|--------------|---------|
-| `gcs` | Show governance compliance score | `agentkb gcs` |
-| `audit` | View audit log of decisions | `agentkb audit --limit 20` |
-| `audit metrics` | Aggregate audit statistics | `agentkb audit metrics` |
-| `audit-bus` | Check Audit Bus health | `agentkb audit-bus status` |
-| `context` | Verify session integrity | `agentkb context` |
-
-### Testing Commands
-
-| Command | What It Does | Example |
-|---------|--------------|---------|
-| `replay` | Run regression fixtures | `agentkb replay` |
-| `adversarial` | Run attack pattern tests | `agentkb adversarial` |
-| `bench` | Performance benchmarks | `agentkb bench` |
-
-### Learning Commands (Tier 2 Detection)
-
-| Command | What It Does | Example |
-|---------|--------------|---------|
-| `learn status` | Check semantic learning state | `agentkb learn` |
-| `learn list` | Show pending specifics | `agentkb learn list` |
-| `learn confirm` | Confirm a detection | `agentkb learn confirm <class_id> <hash>` |
-| `learn reject` | Reject false positive | `agentkb learn reject <class_id> <hash>` |
-
-### Gate Options
+6) Interactive session (single invocation):
 
 ```bash
-# Basic text check
-agentkb gate --text "Your message here"
-
-# Check a file
-agentkb gate --input document.txt
-
-# Get JSON output (for scripts/automation)
-agentkb gate --text "..." --format json
-
-# Auto-repair: try to fix violations automatically
-agentkb gate --text "..." --repair --max-retries 2
-
-# Dry-run: check without logging
-agentkb gate --text "..." --no-log
+agentkb chat --ollama-model llama3.1:8b
 ```
 
-### Audit Options
+## Core commands
+
+### `agentkb init`
+Initializes a new AgentKB workspace in the current directory.
 
 ```bash
-# Recent events
-agentkb audit --limit 50
-
-# Only blocked items
-agentkb audit --decision block
-
-# Time range
-agentkb audit --start 2026-01-25T00:00:00Z
-
-# Export to JSON
-agentkb audit --format json > audit-report.json
-
-# Aggregate metrics
-agentkb audit metrics --format json
+agentkb init
 ```
 
----
+Creates:
+- `.agentkb/governance.yaml` — minimal governance rules
+- `.agentkb/roles.yaml` — RBAC role definitions
+- `.agentkb/classification_map.yaml` — sensitivity mapping
+- `.agentkb/derived/` — runtime artifacts directory
+- `.agentkb/fixtures/` — test fixtures directory
 
-## Understanding Detection
+Options:
+- `--path <dir>` — target directory (default: current directory)
+- `--force` — overwrite existing files
+- `--format json` — machine-readable output
 
-AgentKB uses a **3-tier detection system** to catch sensitive content:
-
-### Tier 1: Pattern Detection (Instant)
-
-Catches obvious patterns using Presidio (Microsoft's PII detection library):
-
-| Pattern | Example |
-|---------|---------|
-| Email addresses | `john@example.com` |
-| Phone numbers | `(555) 123-4567` |
-| Social Security Numbers | `123-45-6789` |
-| Credit card numbers | `4111-1111-1111-1111` |
-| IP addresses | `192.168.1.1` |
-
-**Speed:** ~1-5ms
-
-### Tier 2: Semantic Detection (Fast)
-
-Catches variations and context-aware patterns using AI embeddings:
-
-| What It Catches | Example |
-|-----------------|---------|
-| Disguised PII | `john [at] example [dot] com` |
-| Named entities in context | `Contact our CEO John Smith` |
-| Secret patterns | `the password is: hunter2` |
-| Verbal descriptions | `My social is one two three...` |
-
-**Speed:** ~10-50ms
-
-**22 Reference Classes:** SSN verbal, email obfuscated, phone verbal, address partial, DOB verbal, name relationship, ID partial, medical verbal, card partial, bank verbal, crypto address, income disclosure, API key verbal, password hint, key prefix, connection string, token describe, MFA backup, employer detail, location precise, schedule pattern, travel plan.
-
-### Tier 3: LLM Evaluation (Optional)
-
-For novel cases, can use an LLM to evaluate if content violates governance.
-
-**Speed:** ~100-500ms (only used when needed)
-
-### Detection Output Explained
-
-When something is blocked, you'll see:
-
-```
-BLOCKED (1 violations)
-- sensitivity.levels.PII_INPUT_ONLY.output (high): External outputs must not include PII. Detected: EMAIL_ADDRESS(conf=0.95)
-
-Next steps:
-- Remove or generalize PII (e.g., replace with roles, not identifiers).
-```
-
-**Breaking this down:**
-- `sensitivity.levels.PII_INPUT_ONLY.output` — The rule that was violated
-- `(high)` — Severity level (low/medium/high/critical)
-- `EMAIL_ADDRESS(conf=0.95)` — What was detected and confidence (0-1)
-- `Next steps` — Actionable guidance
-
----
-
-## Operational Modes
-
-AgentKB v0.5.1 introduces **four operational modes** for gate resilience. Gates can operate independently when siblings are unhealthy.
-
-### FULL Mode
-
-Both Access Gate and Output Gate are healthy and can cross-verify.
-
-```
-$ agentkb doctor
-Gates: OK (mode=full)
-```
-
-- Complete cross-verification via Audit Bus
-- Provenance tracking between gates
-- Normal operation
-
-### SOLO-OG Mode (Output Gate Solo)
-
-Output Gate operates independently when Access Gate is unhealthy.
-
-```
-$ agentkb doctor
-Gates: DEGRADED (mode=solo-og, degraded=[access_gate])
-```
-
-- Output Gate runs full 3-tier detection
-- Events include `degraded_flag: true`
-- User experience: Normal output, degraded state logged
-
-### SOLO-AG Mode (Access Gate Solo)
-
-Access Gate operates independently when Output Gate is unhealthy.
-
-```
-$ agentkb doctor
-Gates: DEGRADED (mode=solo-ag, degraded=[output_gate])
-```
-
-- Access Gate validates input, grants access
-- Tool invocation checks still active
-- User experience: May see degraded flag warnings
-
-### ISLAND Mode
-
-Both gates healthy but cannot coordinate (network partition).
-
-- Both gates operate solo
-- Both perspectives captured for post-incident reconstruction
-- Rare edge case
-
-### Default Behavior
-
-AgentKB uses **SOLO_FALLBACK** by default: availability with visibility over strict fail-closed. Gates continue operating when siblings are unhealthy, with degraded state logged for audit.
-
-For strict environments requiring fail-closed on any gate failure, this can be configured programmatically.
-
----
-
-## Monitoring & Compliance
-
-### Governance Compliance Score (GCS)
-
-GCS is a 0-100 score measuring governance health:
+JSON mode:
 
 ```bash
-agentkb gcs
+agentkb init --format json
 ```
 
-**Output:**
-```
-GCS: 100/100
-Components:
-  - Governance loaded: ✓
-  - Session valid: ✓
-  - No critical violations: ✓
-  - Audit logging active: ✓
-```
+### `agentkb doctor`
+Checks that:
+- `.agentkb/governance.yaml` loads and passes init-gate requirements
+- `.agentkb/derived/` is writable
+- Ollama is reachable and the selected model exists (when `--llm ollama`)
 
-| Score | Meaning |
-|-------|---------|
-| 100 | Full compliance — everything working correctly |
-| 80-99 | Good — minor issues, system functional |
-| 50-79 | Warning — some governance gaps |
-| <50 | Critical — governance not enforced |
-
-### Audit Logs
-
-Every decision is logged. View your audit trail:
+JSON mode (for scripts):
 
 ```bash
-# Recent activity
-agentkb audit --limit 10
-
-# Only blocked items
-agentkb audit --decision block
-
-# Today's activity
-agentkb audit --start 2026-01-27T00:00:00Z
-
-# Aggregate metrics
-agentkb audit metrics
+agentkb doctor --format json
 ```
 
-**Where are logs stored?**
-- `.agentkb/derived/audit_events.jsonl` — Machine-readable log
-- `.agentkb/derived/error_events.jsonl` — Violations and errors
-
-### Audit Metrics (v0.5.1)
-
-Get aggregate statistics:
+Risk summary (NIST MAP 5 alignment):
 
 ```bash
-agentkb audit metrics
+agentkb doctor --risk-summary
+```
+
+Surfaces risk posture derived from `classification_map.yaml` + `roles.yaml`:
+- **Sensitivity tiers**: Ordered list of AgentKB sensitivity levels
+- **Classification mapping**: Enterprise classification → AgentKB sensitivity
+- **Roles**: Summary of each role (sensitivity ceiling, write paths, denied operations)
+- **Coverage**: Classification levels defined, roles defined, default role status
+
+JSON mode (includes `risk_summary` object):
+
+```bash
+agentkb doctor --risk-summary --format json
+```
+
+### `agentkb gate`
+Runs the Output Gate on a draft.
+
+Input sources:
+- stdin (pipe)
+- `--input path/to/file`
+- `--text "..."`
+
+Typical usage:
+
+```bash
+cat draft.txt | agentkb gate
+```
+
+Machine-readable output (recommended for IDE/tooling integration):
+
+```bash
+cat draft.txt | agentkb gate --format json
+```
+
+Repair loop:
+
+```bash
+cat draft.txt | agentkb gate --repair --max-retries 2
+```
+
+Notes:
+- Output is always **redacted-safe** (e.g., `<REDACTED:SECRET>`, `<REDACTED:PII>`).
+- By default, blocked attempts append `error_event.v1` to `.agentkb/derived/error_events.jsonl`.
+- Successful gate passes append `audit_event.v1` to `.agentkb/derived/audit_events.jsonl`.
+- Use `--no-log` to suppress logging for quick experiments.
+
+### `agentkb replay`
+Runs deterministic regression fixtures from `.agentkb/fixtures/historical_failures.jsonl`.
+
+```bash
+agentkb replay
+```
+
+JSON mode:
+
+```bash
+agentkb replay --format json
+```
+
+### `agentkb demo`
+Runs a synthetic demo showing:
+- the model can "see" SECRET input
+- the Output Gate blocks disclosure
+- the loop can repair into allowed EXTERNAL output
+
+```bash
+agentkb demo --ollama-model llama3.1:8b
+```
+
+JSON mode:
+
+```bash
+agentkb demo --format json
+```
+
+### `agentkb chat`
+Starts an interactive session (single invocation) with:
+- persistent governance load + time anchor
+- rolling in-memory conversation history
+- Output Gate enforcement on every model reply
+
+```bash
+agentkb chat --ollama-model llama3.1:8b
+```
+
+Commands:
+- `/help` show commands
+- `/reset` clear history
+- `/quit` exit
+
+Notes:
+- Blocked replies are shown as **redacted-safe** text.
+- By default, blocks append `error_event.v1` to `.agentkb/derived/error_events.jsonl`.
+- Successful responses append `audit_event.v1` to `.agentkb/derived/audit_events.jsonl`.
+- Use `--repair --max-retries N` to attempt automatic rewrites on blocks.
+
+### `agentkb scan`
+Discovery scan for PII and secret patterns in a corpus. Reports counts and paths only (never content).
+
+```bash
+agentkb scan --path ./corpus
+```
+
+With RBAC filtering (only scan paths allowed for role):
+
+```bash
+agentkb scan --path ./corpus --role reader
+```
+
+Note: `--role` requires a discoverable repo root (either the scan path is within an AgentKB repo, or `--repo-root` is explicitly provided).
+
+JSON mode:
+
+```bash
+agentkb scan --path ./corpus --format json
+```
+
+Options:
+- `--path` directory to scan (default: current directory)
+- `--include-hidden` include hidden files/directories
+- `--role` filter paths by RBAC role permissions
+- `--format text|json` output format
+
+Patterns detected:
+- **PII**: email, phone, SSN, credit card
+- **Secrets**: API keys, connection strings, private keys, generic secrets
+
+Configuration: `.agentkb/scan_config.yaml` (extensions, skip dirs, limits)
+
+Note: Some findings may be intentional (see `.agentkb/scan_config.yaml` policy header for documented exceptions).
+
+### `agentkb learn`
+Semantic learning management for closed-loop Tier 2 detection improvement.
+
+When Tier 2 (semantic) detection flags a violation, it can be queued for human review. Confirming violations teaches the system to detect similar patterns; rejecting them removes false positives.
+
+**Status** (default):
+```bash
+agentkb learn
+agentkb learn status
 ```
 
 Shows:
-- Blocks per day
-- Rule coverage (which rules triggered)
-- Event counts by type
-- Trends over time
+- Model availability
+- Pending specifics awaiting confirmation
+- Confirmed specifics count
+- Learned centroids (computed after 2+ confirmations per class)
 
-### Context Integrity
+**List pending specifics**:
+```bash
+agentkb learn list
+agentkb learn list --class-id ssn_verbal  # Filter by class
+```
 
-Verify your session hasn't drifted:
+Each pending specific shows:
+- Reference class ID
+- Text hash (short identifier)
+- Text preview (first 80 chars)
+- Detection timestamp and source
+
+**Confirm a specific** (true positive → feeds learning):
+```bash
+agentkb learn confirm <class_id> <text_hash>
+```
+
+After 2+ confirmations for the same class, a learned centroid is computed and saved to `.agentkb/derived/learned_centroids.json`. The SemanticEmbedder automatically loads these on next detection.
+
+**Reject a specific** (false positive → remove from pending):
+```bash
+agentkb learn reject <class_id> <text_hash>
+```
+
+JSON mode:
+```bash
+agentkb learn status --format json
+agentkb learn list --format json
+```
+
+### `agentkb context`
+Verify context integrity invariants before consequential actions.
 
 ```bash
 agentkb context
 ```
 
-This checks:
-- Governance version matches what was loaded at session start
-- No unexpected changes to configuration
-- Time anchor is valid
+Output shows:
+- Verified status (VERIFIED or FAILED)
+- Invariant check results (governance_loaded, time_anchored, role_confirmed)
+- Time anchor (UTC and local with timezone)
+- Governance info (version, sha256)
 
-### Gate Health
+JSON mode:
 
-Check operational mode and gate status:
+```bash
+agentkb context --format json
+```
 
+Options:
+- `--role` RBAC role to verify (default: reader)
+- `--format text|json` output format
+
+Use cases:
+- Preflight check before consequential operations
+- Debugging context corruption issues
+- CI/automation context validation
+
+### `agentkb gcs`
+Query current Governance Compliance Score (GCS) and gate eligibility.
+
+```bash
+agentkb gcs
+```
+
+Output shows:
+- Current score (0-100)
+- Violations in window (default: 24h)
+- Penalties applied and recovery (passive + active)
+- Gate eligibility for consequential actions
+
+JSON mode:
+
+```bash
+agentkb gcs --format json
+```
+
+Options:
+- `--window-hours` time window for violations (default: 24)
+- `--format text|json` output format
+
+#### GCS Matrix (Phase 2.9.5)
+
+GCS now operates as a **unified matrix** with two temporal dimensions:
+
+**1. Violation History (PRE-session gate)**
+Evaluated at session start. Based on historical error events within the scoring window.
+- Score: 0-100 (penalties for violations, recovery over time)
+- Gates: Controls eligibility for consequential actions (rule_proposal, content_mutation, architectural_decision, capability_removal)
+- Blocking: Critical violations (score < 50) block session start
+
+**2. Integration State (WITHIN-session verification)**
+Re-verified before consequential operations during an active session.
+- Indicators checked:
+  - `governance_sha_anchored` — Governance hasn't drifted since session start
+  - `time_anchor_valid` — Time anchor is still fresh
+  - `context_pressure_nominal` — No signs of context truncation
+  - `no_deflection_pattern` — No governance circumvention attempts detected
+- Score: 0-100 (25 points per indicator)
+- Status: PASS (score ≥ 75) or DEGRADED (score < 75)
+
+**Why two dimensions?**
+Agents operating in long contexts are susceptible to:
+- **Context drift**: Governance constraints deprioritized as conversation grows
+- **Truncation**: Critical governance context silently dropped
+- **Deflection**: Attempts to circumvent governance via conversational manipulation
+
+The GCS Matrix addresses these by separating historical compliance (can this agent start?) from active integration (is governance still enforced?).
+
+**Checking GCS Matrix:**
+```bash
+agentkb session start --profile build --format json
+```
+
+JSON output includes:
+```json
+{
+  "gcs_matrix": {
+    "session_ready": true,
+    "violation_history": {
+      "score": 100,
+      "violations_in_window": 0,
+      "gates": { "rule_proposal": true, "content_mutation": true, ... }
+    },
+    "integration_state": {
+      "score": 100,
+      "status": "pass",
+      "indicators": [
+        { "name": "governance_sha_anchored", "passed": true, "score": 25 },
+        { "name": "time_anchor_valid", "passed": true, "score": 25 },
+        ...
+      ]
+    }
+  }
+}
+```
+
+#### `agentkb gcs repair`
+Record a repair action to actively recover GCS points after a violation.
+
+```bash
+agentkb gcs repair --error-id <uuid> --type acknowledge|explain|propose
+```
+
+Repair types and points:
+- `acknowledge` (+10): "I see the error"
+- `explain` (+15): "I understand why it happened"
+- `propose` (+20): "Here's how to prevent recurrence"
+
+Notes:
+- Each error can only be repaired once
+- Repair points are in addition to passive recovery (+5/hour)
+- Error IDs can be found in `.agentkb/derived/error_events.jsonl`
+
+### `agentkb session start`
+Verify context integrity and create a session fingerprint for drift detection.
+
+```bash
+agentkb session start --profile build
+```
+
+With fingerprint saved to file:
+
+```bash
+agentkb session start --profile build --save-fingerprint ./session_fp.json
+```
+
+JSON mode (includes fingerprint for programmatic use):
+
+```bash
+agentkb session start --profile build --format json
+```
+
+Options:
+- `--profile` load profile name (default: from session.yaml current_profile)
+- `--role` RBAC role for session (default: reader)
+- `--save-fingerprint <path>` save fingerprint JSON to file
+- `--format text|json` output format
+
+Output includes:
+- Profile and role
+- Verified status
+- Governance info (version, sha256)
+- Time anchor (UTC and local)
+- Fingerprint (for drift detection at session end)
+- Load order (files to read)
+
+### `agentkb session end`
+Verify session end state against a fingerprint, detect drift.
+
+```bash
+agentkb session end --fingerprint ./session_fp.json
+```
+
+Or with inline JSON:
+
+```bash
+agentkb session end --fingerprint-json '{"governance_sha":"...", ...}'
+```
+
+Or pipe fingerprint from stdin:
+
+```bash
+cat session_fp.json | agentkb session end
+```
+
+JSON mode:
+
+```bash
+agentkb session end --fingerprint ./session_fp.json --format json
+```
+
+Options:
+- `--fingerprint <path>` path to fingerprint JSON file
+- `--fingerprint-json <json>` inline fingerprint JSON string
+- `--role` current RBAC role (default: reader)
+- `--format text|json` output format
+
+Detected drifts:
+- `governance_sha_changed` — governance.yaml content modified (high severity)
+- `governance_version_changed` — codex version changed (high severity)
+- `role_changed` — RBAC role changed (high severity)
+- `governance_lost` — governance no longer loaded (high severity)
+- `role_lost` — role no longer confirmed (high severity)
+
+Exit codes:
+- 0: verified (no drift)
+- 1: drift detected or error
+
+### `agentkb bench`
+Run performance benchmarks to validate NFR (Non-Functional Requirements).
+
+```bash
+agentkb bench
+```
+
+Output shows:
+- Output Gate p95 latency (NFR: < 1000ms)
+- Init Gate p95 latency (NFR: < 500ms)
+- Classification throughput (NFR: > 1000 docs/min)
+- Audit Write p95 latency (NFR: < 50ms)
+
+JSON mode:
+
+```bash
+agentkb bench --format json
+```
+
+Options:
+- `--target output_gate|init_gate|classification|audit_write|all` benchmark target (default: all)
+- `--iterations N` iterations per benchmark (default: 100)
+- `--save-baseline` save results to `.agentkb/derived/bench_baseline.json`
+- `--compare-baseline` compare against saved baseline, fail on regression (>20% worse)
+- `--format text|json` output format
+
+Use cases:
+- Pre-release NFR validation
+- CI regression detection (`--compare-baseline`)
+- Performance debugging (`--target <specific>`)
+
+Exit codes:
+- 0: all NFRs pass (and no regression if comparing baseline)
+- 1: NFR failure or regression detected
+
+### `agentkb decommission` (v0.7 — stub)
+Orderly shutdown and audit export for AgentKB deployments. NIST GOVERN 1.7 alignment.
+
+```bash
+agentkb decommission --export-path ./audit-archive
+```
+
+Planned capabilities:
+- Export full audit log to portable archive
+- Generate final integrity snapshot
+- Validate no orphaned derived artifacts
+- Emit decommission receipt with timestamp + hash
+
+*Note: Not yet implemented. See roadmap.*
+
+## Output Gate rules
+The MVP gate is intentionally small but high-leverage:
+
+- SECRET is **never** allowed in EXTERNAL output.
+- PII is blocked in EXTERNAL output (minimal detection):
+  - email addresses
+  - phone numbers
+  - SSNs (###-##-####)
+- **FACT/DERIVED claims require evidence** in EXTERNAL output:
+  - Quantified claims ("95% of users", "100 customers")
+  - Absolute statements ("always", "never", "all")
+  - Computed/derived claims ("total increased", "average fell")
+  - Comparative claims ("grew by 15%", "decreased")
+- Unsourced currency/metric claims are blocked (heuristic; provide evidence).
+- Duration claims require **start+end ISO timestamps**.
+- Relative temporal language ("today", "last week") requires an explicit date anchor.
+
+**False positive mitigation:**
+- Hypothetical statements bypass evidence ("if we had 100 users")
+- Qualified claims bypass evidence ("approximately 100 users")
+- Questions bypass evidence ("Are there 100 users?")
+
+## Minimal evidence / citations (avoid clutter)
+The gate's evidence heuristic accepts minimal references. Prefer **one short citation** per risky claim rather than clutter.
+
+Accepted evidence formats:
+- URLs: `https://example.com/report`
+- Citations: `Source: report.pdf:10` or `Evidence: docs/metrics.md:10-18`
+- References: `According to: Q4 analysis`
+- Inline attributions: `(Smith 2024)` or `[Citation]`
+
+If evidence is unavailable:
+- remove the metric
+- mark unknown
+- rephrase qualitatively
+
+## Workflow patterns (browser / IDE / phone)
+The MVP is designed so the *stable interface* is the gate:
+- generate drafts anywhere (browser/IDE/phone)
+- run `agentkb gate` before sending/sharing
+
+Practical patterns:
+- **IDE / files**: write draft → `agentkb gate --input draft.txt` → copy safe output
+- **Automation**: use `--format json` to plug into tasks/CI
+
+Clipboard-based workflows are possible, but keep in mind: the gate redacts what it prints, but it does not scrub your clipboard.
+
+## Session mode (interactive REPL)
+Use `agentkb chat` for a coherent, single-invocation session.
+
+This mode maintains a persistent governance load + time anchor per session, keeps in-memory chat history for context, and enforces the Output Gate on every model reply.
+
+## Optional: API server
+The REST API server exposes the gate and chat loop over HTTP.
+
+See:
+- `docs/api_reference.md`
+- `docs/deployment.md`
+
+Quick start:
+
+```bash
+python -m pip install -e ".[server]"
+uvicorn agentkb.server.api:app --host 0.0.0.0 --port 8000
+```
+
+## Optional: MCP server
+See `docs/mcp_integration.md`.
+
+## Operational Modes (Phase 2.9.5)
+AgentKB supports four operational modes for gate independence and resilience.
+
+**Implementation Status (as of Phase 2.9.5):**
+
+| Gate | Status | Capabilities |
+|------|--------|-------------|
+| **Output Gate** | ✓ Operational | 3-tier detection (Presidio + Semantic + LLM), PII/secret redaction, claim evidence enforcement |
+| **Access Gate** | Foundation only | Rate limiting, basic prompt injection patterns, input PII detection |
+| **Tool Invocation Gate** | Stub only | Tool name/role permission checks. **Does NOT scan tool payloads for sensitive content** (Phase 3.7) |
+
+**Phase 3 Required for Full Access Control:**
+- 3.2 `content_layer_rbac` — Retrieval-time enforcement (what agents can READ)
+- 3.7 `tool_invocation_gate` — Payload content scanning (prevents SECRET exfiltration via tool calls)
+
+### FULL Mode
+Both gates registered and sending heartbeats.
+- **Current behavior**: Output Gate provides full 3-tier detection; Access Gate provides basic input validation
+- **Phase 3+**: Will include cross-verification and content-layer RBAC
+
+### SOLO-OG Mode (Output Gate Solo)
+Output Gate operates independently when Access Gate is unhealthy.
+- **Condition**: Access Gate unhealthy or unregistered
+- **Behavior**: Output Gate runs 3-tier detection independently
+- **Audit**: Events include `operational_mode: solo`, `degraded_flag: true`
+- **User experience**: Normal output, degraded state logged internally
+
+### SOLO-AG Mode (Access Gate Solo)
+Access Gate operates independently when Output Gate is unhealthy.
+- **Condition**: Output Gate unhealthy or unregistered
+- **Behavior**: Access Gate validates input (rate limit, injection patterns, input PII)
+- **Audit**: Events include `operational_mode: solo`, `degraded_flag: true`
+- **User experience**: Responses may include degraded flag warning
+- **Limitation**: No output content validation in this mode
+
+### ISLAND Mode
+Both gates healthy but cannot coordinate (network partition).
+- **Condition**: Both healthy but Audit Bus coordination unavailable
+- **Behavior**: Both gates operate solo, write independently
+- **Audit**: Both perspectives captured for post-incident reconstruction
+- **User experience**: Degraded flags on both ends
+
+### Checking Operational Mode
 ```bash
 agentkb doctor
 ```
 
-Shows:
-- Governance status
-- Gate health (access_gate, output_gate)
-- Operational mode (full, solo-og, solo-ag, island)
-- Degraded gates if any
-
----
-
-## Expected Behavior
-
-### What "Working Correctly" Looks Like
-
-**1. Doctor shows READY with gate status:**
+The doctor command reports current operational mode:
 ```
-$ agentkb doctor
-AgentKB Doctor
-==============
-Governance: OK (v0.3.7)
-Derived dir: OK (writable)
 Gates: OK (mode=full)
-Status: READY
+```
+or:
+```
+Gates: FAIL (mode=degraded, degraded=[access_gate])
 ```
 
-**2. Clean text passes through:**
-```
-$ agentkb gate --text "The quarterly report shows 15% growth."
-ALLOW
-The quarterly report shows 15% growth.
-```
+### Configuration
+Default behavior is **SOLO_FALLBACK** (continue with degraded flag rather than block).
+This prioritizes availability with visibility over strict fail-closed.
 
-**3. PII is blocked with guidance:**
-```
-$ agentkb gate --text "Contact john.doe@company.com for details"
-BLOCKED (1 violations)
-- sensitivity.levels.PII_INPUT_ONLY.output (high): External outputs must not include PII. Detected: EMAIL_ADDRESS(conf=1.00)
+For strict environments requiring fail-closed on any gate failure, configure degraded behavior in code:
+```python
+from agentkb.gate.degraded_mode import DegradedBehavior, DegradedModeHandler
 
-Next steps:
-- Remove or generalize PII (e.g., replace with roles, not identifiers).
+handler = DegradedModeHandler(
+    health_monitor,
+    audit_bus,
+    gate_id="output_gate",
+    degraded_behavior=DegradedBehavior.FAIL_CLOSED,  # Block all when degraded
+)
 ```
-
-**4. Secrets trigger critical blocks:**
-```
-$ agentkb gate --text "API key: sk-abc123def456"
-BLOCKED (1 violations)
-- sensitivity.levels.SECRET.output (critical): External outputs must never include SECRET data. Detected: SECRET_KEY(conf=0.90)
-```
-
-**5. Unsourced claims are flagged:**
-```
-$ agentkb gate --text "Revenue increased by exactly $5.2 million."
-BLOCKED (1 violations)
-- claims.output_tiers.external.require_evidence (high): EXTERNAL outputs require evidence for DERIVED claims.
-
-Next steps:
-- Add source citation or rephrase as estimate/opinion.
-```
-
-**6. GCS shows full compliance when healthy:**
-```
-$ agentkb gcs
-GCS: 100/100
-```
-
-**7. Degraded mode is visible when gates are unhealthy:**
-```
-$ agentkb doctor
-Gates: DEGRADED (mode=solo-og, degraded=[access_gate])
-```
-
----
 
 ## Troubleshooting
-
-### Installation Problems
-
-| Problem | Cause | Fix |
-|---------|-------|-----|
-| `pip install` fails with "wheel not supported" | Wrong Python version or platform | Check `python --version` is 3.12.x; download correct wheel |
-| `agentkb: command not found` | Scripts folder not in PATH | Use `python -m agentkb` instead |
-| Import errors after install | Corrupted installation | `pip uninstall agentkb` then reinstall |
-
-### Initialization Problems
-
-| Problem | Cause | Fix |
-|---------|-------|-----|
-| `Governance load failed` | Missing `.agentkb/` folder | Run `agentkb init` |
-| `Permission denied` | No write access to folder | Check folder permissions |
-| Config files corrupted | Manual edits broke YAML | Run `agentkb init --force` to reset |
-
-### Ollama Problems
-
-| Problem | Cause | Fix |
-|---------|-------|-----|
-| "Failed to connect to Ollama" | Ollama not running | Windows: Check system tray. macOS/Linux: Run `ollama serve` |
-| "Model not found" | Model not downloaded | Run `ollama pull llama3.1:8b` |
-| Very slow responses | Model too large for hardware | Try `ollama pull llama3.2:3b` or `phi3:mini` |
-| Out of memory | Not enough RAM | Use smaller model or close other apps |
-
-### API Key Problems
-
-| Problem | Cause | Fix |
-|---------|-------|-----|
-| "API_KEY not set" | Environment variable missing | Set it: `$env:ANTHROPIC_API_KEY = "..."` (PowerShell) |
-| "Invalid API key" | Wrong/expired key | Generate new key from provider console |
-| "Rate limited" | Too many requests | Wait a few minutes, or upgrade API plan |
-
-### Gate Problems
-
-| Problem | Cause | Fix |
-|---------|-------|-----|
-| Blocks everything | Overly strict config (rare) | Check violation details; contact support |
-| Allows everything | Governance not loaded | Run `agentkb doctor` to verify |
-| Wrong detections | Detection false positive | Use `--format json` for details; report issue |
-| Slow response | Large text input | Split into smaller chunks |
-| Degraded mode | Sibling gate unhealthy | Check `agentkb doctor` for details |
-
-### GCS Problems
-
-| Problem | Cause | Fix |
-|---------|-------|-----|
-| GCS below 100 | Governance issues | Run `agentkb doctor` for details |
-| GCS shows 0 | Governance not initialized | Run `agentkb init` |
-| Can't query GCS | No audit data | Run some gate commands first |
-
-### Common Error Messages
-
-| Error | Meaning | Fix |
-|-------|---------|-----|
-| `Governance load failed` | No `.agentkb/governance.yaml` | Run `agentkb init` |
-| `Unknown role` | Role not defined | Use `reader` (default) or check `.agentkb/roles.yaml` |
-| `LLM provider error` | API call failed | Check API key and internet |
-| `Session expired` | Chat session timed out | Start new `agentkb chat` |
-| `Context integrity violation` | Config changed mid-session | Restart your session |
-| `Gate unhealthy` | Sibling gate not responding | Check logs; system continues in solo mode |
-
----
-
-## Glossary
-
-| Term | Meaning |
-|------|---------|
-| **Access Gate** | Input validation + RBAC filter controlling what agent can read |
-| **Agent** | An AI system that performs tasks (ChatGPT, Claude, etc.) |
-| **API Key** | Secret credential for accessing cloud AI services |
-| **Audit Bus** | Event coordination layer for gate-to-gate communication |
-| **Audit Log** | Record of all gate decisions for compliance |
-| **Degraded Mode** | Gate operating independently when sibling is unhealthy |
-| **GCS** | Governance Compliance Score — 0-100 health metric |
-| **Governance** | Structural rules defining what AI can and cannot output |
-| **Gov-Compliant** | Text that passes all governance rules |
-| **Gov-Noncompliant** | Text that violates one or more governance rules |
-| **LLM** | Large Language Model — the AI technology behind ChatGPT, Claude |
-| **Ollama** | Software that runs AI models locally on your computer |
-| **Operational Mode** | Current gate coordination state (full, solo-og, solo-ag, island) |
-| **Output Gate** | AgentKB's filter that checks responses for violations |
-| **PII** | Personally Identifiable Information — emails, SSNs, phone numbers |
-| **Presidio** | Microsoft's open-source PII detection library (used in Tier 1) |
-| **RBAC** | Role-Based Access Control — different permissions per role |
-| **Redaction** | Replacing sensitive text with placeholders like `<REDACTED>` |
-| **Semantic Detection** | AI-powered detection that understands meaning, not just patterns |
-| **SOLO_FALLBACK** | Default behavior where gates continue operating when siblings fail |
-| **Tool Gate** | Filter controlling agent tool invocations (nested in Access Gate) |
-| **Violation** | When text breaks a governance rule |
-| **Wheel** | Pre-built Python package file (`.whl` extension) |
-
----
-
-## Getting Help
-
-- **GitHub Issues:** [github.com/j-w-code/AgentKB-public/issues](https://github.com/j-w-code/AgentKB-public/issues)
-- **Email:** agentkb_jw@proton.me
-
----
-
-*© 2025-2026 J.W. All rights reserved.*
+- `agentkb doctor` fails Ollama:
+  - ensure Ollama is running
+  - ensure the model exists locally
+- Gate blocks unexpectedly:
+  - inspect violations + "Next steps" hints
+  - try `--format json` to integrate into tooling and display richer context
+- Gate shows degraded mode:
+  - check `agentkb doctor` for gate health status
+  - verify sibling gate is running and sending heartbeats
+  - check Audit Bus directory permissions
