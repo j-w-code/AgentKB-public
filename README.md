@@ -108,8 +108,10 @@ AgentKB governance primitives align with:
 | **Phase 2.5-2.7** | Structural Enforcement (3-tier detection, Audit Bus) | ✅ Complete |
 | **Phase 2.9** | Foundation Hardening (adversarial tests, locale patterns) | ✅ Complete |
 | **Phase 2.9.5** | Four Operational Modes (gate independence) | ✅ Complete |
-| **Phase 3** | Access Control (RBAC enforcement) | 📋 Next |
-| **Phase 4** | Enterprise (IdP, SDKs, Dashboard) | 📋 Planned |
+| **Phase 3** | Access Control (RBAC enforcement) | 🔒 Private |
+| **Phase 4** | Enterprise (IdP, SDKs, Dashboard) | 🔒 Private |
+
+> ⚠️ **Public Baseline:** This release is frozen at Phase 2.9.5. Phases 3+ continue in private development. See [ROADMAP.md](ROADMAP.md) for licensing details.
 
 ### What's New in v0.5.1
 

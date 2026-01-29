@@ -104,15 +104,19 @@ Agent Error → Log → Pattern Detection → Rule Generation → Governance Upd
 
 ---
 
-## Current Implementation
+## Current Implementation (Public Baseline v0.5.1)
 
-A working MVP exists with:
+The public release includes:
 - **Output Gate** — Blocks secrets and PII at output time
-- **Access Gate** — Role-based content scoping at retrieval time (Phase 3)
+- **Access Gate primitive** — Input validation with nested Tool Invocation Gate
 - **RBAC** — Role-based access with sensitivity ceilings
 - **Discovery scan** — PII/secret pattern detection across corpus
+- **Audit Bus** — Gate-to-gate event coordination
+- **Four Operational Modes** — FULL, SOLO-OG, SOLO-AG, ISLAND
 - **Closed-loop logging** — Blocked outputs feed error event schema
 - **Replay harness** — Deterministic regression tests from historical failures
+
+**Note:** Content-layer RBAC enforcement (retrieval-time filtering) continues in private development (Phase 3).
 
 **Framework alignment:** Architecture independently derived, later validated against NIST AI RMF 1.0 (GOVERN, MAP, MEASURE), OWASP Agentic Security Initiative 2026 (8/10 categories), Gartner AI TRiSM (AI Governance + Runtime Enforcement), and Proofpoint AI Security research.
 
