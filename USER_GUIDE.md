@@ -6,9 +6,9 @@ This guide covers the **local CLI MVP** focused on core governance enforcement:
 - **Output Gate**: policy enforcement on agent outputs (PII, secrets, claims).
 - **Closed-loop seed**: blocked outputs append `error_event.v1` records (JSONL).
 
-Optional integration layer (covered elsewhere):
-- REST API server: `docs/api_reference.md`
-- MCP server: `docs/mcp_integration.md`
+Optional integration layer:
+- REST API server: [API_REFERENCE.md](API_REFERENCE.md)
+- MCP server: [MCP_INTEGRATION.md](MCP_INTEGRATION.md)
 
 Out of scope (by design): retrieval/RAG, vector DBs, dashboards.
 
@@ -642,22 +642,32 @@ Use `agentkb chat` for a coherent, single-invocation session.
 
 This mode maintains a persistent governance load + time anchor per session, keeps in-memory chat history for context, and enforces the Output Gate on every model reply.
 
-## Optional: API server
+## Optional: API Server
+
 The REST API server exposes the gate and chat loop over HTTP.
 
-See:
-- `docs/api_reference.md`
-- `docs/deployment.md`
-
-Quick start:
-
+**Quick Start:**
 ```bash
-python -m pip install -e ".[server]"
+pip install agentkb[server]
 uvicorn agentkb.server.api:app --host 0.0.0.0 --port 8000
 ```
 
-## Optional: MCP server
-See `docs/mcp_integration.md`.
+**Documentation:**
+- [API_REFERENCE.md](API_REFERENCE.md) — Endpoint reference
+- [DEPLOYMENT.md](DEPLOYMENT.md) — Docker, Kubernetes deployment
+
+## Optional: MCP Server
+
+AgentKB exposes governance tools via the Model Context Protocol (MCP) for integration with Claude Desktop, Cursor, and other MCP-compatible clients.
+
+**Quick Start:**
+```bash
+pip install agentkb[mcp]
+python -m agentkb.server.mcp --transport stdio
+```
+
+**Documentation:**
+- [MCP_INTEGRATION.md](MCP_INTEGRATION.md) — Tools, prompts, client configuration
 
 ## Operational Modes (Phase 2.9.5)
 AgentKB supports four operational modes for gate independence and resilience.

@@ -83,7 +83,7 @@ Together: Defense-in-depth for enterprise AI.
 AgentKB governance primitives align with:
 - **NIST AI RMF 1.0** — Strong (3/4 functions)
 - **OWASP Agentic Top 10 (2026)** — Strong (8/10 categories)
-- **Real-World Systems Failure Tests** — Strong (4.7/5 categories)
+- **Therac-25 / Ariane 5 Benchmark** — Strong (4.7/5 categories)
 - **Gartner AI TRiSM** — Strong (3/5 pyramid layers)
 - **Proofpoint AI Security** — Strong (4/5 requirements)
 
