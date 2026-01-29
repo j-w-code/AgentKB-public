@@ -133,7 +133,9 @@ AgentKB governance primitives align with:
 
 ## Getting Started
 
-> 📖 **New to AgentKB?** See the [User Guide](USER_GUIDE.md) for complete setup instructions, including Python installation, LLM configuration, and troubleshooting.
+> 🚀 **New to AgentKB?** Start with the [Quick Start Guide](QUICKSTART.md) — get running in ~10 minutes with zero Python experience required.
+>
+> 📖 Already comfortable with Python? Jump to the [User Guide](USER_GUIDE.md) for the full command reference.
 
 ### Installation
 

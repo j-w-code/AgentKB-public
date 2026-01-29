@@ -1,7 +1,11 @@
-# AgentKB CLI User Guide (MVP)
+# AgentKB CLI User Guide
+
+> 🚀 **New to AgentKB or Python?** Start with the [Quick Start Guide](QUICKSTART.md) instead — it walks you through installation step-by-step with no prior experience required.
+
+---
 
 ## Scope
-This guide covers the **local CLI MVP** focused on core governance enforcement:
+This guide is a complete reference for AgentKB CLI commands. It covers the **local CLI MVP** focused on core governance enforcement:
 - **Init Gate**: governance must load before anything runs.
 - **Output Gate**: policy enforcement on agent outputs (PII, secrets, claims).
 - **Closed-loop seed**: blocked outputs append `error_event.v1` records (JSONL).
@@ -12,112 +16,53 @@ Optional integration layer:
 
 Out of scope (by design): retrieval/RAG, vector DBs, dashboards.
 
-## Install
+## Installation
 
+See [QUICKSTART.md](QUICKSTART.md) for detailed installation instructions including Python setup.
+
+**Quick install** (if you have Python 3.10+ already):
 ```bash
 pip install agentkb
-# Or from source:
-# python -m pip install -e ".[dev]"
 ```
 
-If you want LLM-in-the-loop:
-- Install and run **Ollama** locally.
+**With LLM support** (for chat/demo commands):
+1. Install [Ollama](https://ollama.ai)
+2. Run: `ollama pull llama3.2:3b`
 
-## Validate (mirrors CI)
-AgentKB has a single canonical validation gate:
+## Quick Start
 
-```bash
-python scripts/validate.py --repo-root .
-```
-
-This runs (in order):
-- Ruff (lint)
-- Ruff (format check)
-- Unit tests
-- Session start smoke (`agentkb session start --profile build`) — **Note:** `session start` is a builder tool for CI validation, not a runtime user command
-- Bandit (security scan)
-- Boundary lint (process/product firewall)
-
-CI installs dependencies using a pinned constraints lock:
-- `constraints/ci.txt`
-
-To run locally with CI-parity pins:
-
-```bash
-python -m pip install -e ".[dev]" -c constraints/ci.txt
-python scripts/validate.py --repo-root .
-```
-
-CI also runs a secrets scan using gitleaks + `.gitleaks.toml`. Local gitleaks runs are optional.
-
-### Refreshing the CI lock (maintainers)
-Refresh `constraints/ci.txt` only when you intend to update the pinned toolchain (scheduled maintenance, or to fix CI after an upstream break).
-
-```bash
-python -m pip install -e ".[lock]"
-python -m piptools compile pyproject.toml --extra dev --extra perf --output-file constraints/ci.txt --resolver backtracking
-```
-
-After refreshing, rerun `python scripts/validate.py --repo-root .` and commit the updated lock.
-
-## Quick start
-
-### 1. Initialize workspace (new users)
+### 1. Initialize workspace
 
 ```bash
 agentkb init
 ```
 
-This creates `.agentkb/` with minimal governance files. Skip if you already have `.agentkb/governance.yaml`.
+This creates `.agentkb/` with minimal governance files.
 
-### 2. Verify workspace
+### 2. Verify setup
 
 ```bash
 agentkb doctor
 ```
 
-### 3. Session start (builders only)
-
-**Note:** `agentkb session start` is for agents building the AgentKB codebase, not end users.
-
-**Note:** `agentkb session start` is a builder tool for agents working on the AgentKB codebase. End-users deploying AgentKB do not use this command.
+### 3. Test the gate
 
 ```bash
-agentkb session start --profile build
+agentkb gate --text "Hello world"
 ```
 
-JSON mode (recommended for tooling / downstream builder agents):
+### 4. (Optional) Demo with LLM
+
+If you have Ollama installed:
 
 ```bash
-agentkb session start --profile build --format json
+agentkb demo --ollama-model llama3.2:3b
 ```
 
-Notes:
-- This emits the resolved load order from `session.yaml` and a fresh time anchor.
-- Treat **resume as governed**: after long idle (overnight), rerun `agentkb session start` to re-anchor time.
-
-3) Demo (LLM-in-the-loop, gated):
+### 5. (Optional) Interactive chat
 
 ```bash
-agentkb demo --ollama-model llama3.1:8b
-```
-
-4) Gate any draft:
-
-```bash
-cat draft.txt | agentkb gate
-```
-
-5) Auto-repair blocked drafts (LLM rewrites + retries):
-
-```bash
-cat draft.txt | agentkb gate --repair --max-retries 2
-```
-
-6) Interactive session (single invocation):
-
-```bash
-agentkb chat --ollama-model llama3.1:8b
+agentkb chat --ollama-model llama3.2:3b
 ```
 
 ## Core commands
@@ -229,7 +174,7 @@ Runs a synthetic demo showing:
 - the loop can repair into allowed EXTERNAL output
 
 ```bash
-agentkb demo --ollama-model llama3.1:8b
+agentkb demo --ollama-model llama3.2:3b
 ```
 
 JSON mode:
@@ -245,7 +190,7 @@ Starts an interactive session (single invocation) with:
 - Output Gate enforcement on every model reply
 
 ```bash
-agentkb chat --ollama-model llama3.1:8b
+agentkb chat --ollama-model llama3.2:3b
 ```
 
 Commands:
