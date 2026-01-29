@@ -99,7 +99,7 @@ AgentKB governance primitives align with:
 
 ## Current Status
 
-> ✅ **Phase 1-2.9.5 Public Release** (v0.5.1)
+> ✅ **Phase 1-2.9.5 Public Release** (v0.5.2)
 
 | Phase | Focus | Status |
 |-------|-------|--------|
@@ -113,7 +113,7 @@ AgentKB governance primitives align with:
 
 > ⚠️ **Public Baseline:** This release is frozen at Phase 2.9.5. Phases 3+ continue in private development. See [ROADMAP.md](ROADMAP.md) for licensing details.
 
-### What's New in v0.5.1
+### What's New in v0.5.2
 
 - **Four Operational Modes**: FULL, SOLO-OG, SOLO-AG, ISLAND — gates can operate independently
 - **GCS Matrix**: Unified compliance structure with two temporal dimensions:
@@ -148,7 +148,7 @@ Download the wheel for your platform from [GitHub Releases](https://github.com/j
 Then install:
 
 ```bash
-pip install agentkb-0.5.1-cp312-cp312-<your-platform>.whl
+pip install agentkb-0.5.2-cp312-cp312-<your-platform>.whl
 ```
 
 ### Quick Start
