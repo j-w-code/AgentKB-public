@@ -99,7 +99,7 @@ AgentKB governance primitives align with:
 
 ## Current Status
 
-> ✅ **Phase 1-2.9.5 Public Release** (v0.5.2)
+> ✅ **Phase 1-2.10.1 Public Release** (v0.5.3)
 
 | Phase | Focus | Status |
 |-------|-------|--------|
@@ -113,19 +113,32 @@ AgentKB governance primitives align with:
 
 > ⚠️ **Public Baseline:** This release is frozen at Phase 2.9.5. Phases 3+ continue in private development. See [ROADMAP.md](ROADMAP.md) for licensing details.
 
-### What's New in v0.5.2
+### What's New in v0.5.3
+
+- **Audit Attribution Origin Field** (Phase 2.10): Every audit event now includes `context.origin` identifying the action source:
+  - `human_cli` — Human via CLI commands
+  - `agent_mcp` — Agent via MCP tools
+  - `system_http` — System via REST API
+  - Additional types: `human_http`, `agent_llm`, `system_cron`, `system_internal`
+- **Session Correlation** (Phase 2.10.1): `origin.session_id` now populated for attribution correlation:
+  - API: Uses existing session ID
+  - CLI: Generates ephemeral session ID per invocation
+  - MCP: Generates ephemeral session ID per tool call
+- **MCP Audit Logging**: MCP tools now log to audit trail (was missing in prior releases)
+
+**Test Coverage:** 671 tests passing • 67% code coverage • GCS 100
+
+<details>
+<summary>What was new in v0.5.2</summary>
 
 - **Four Operational Modes**: FULL, SOLO-OG, SOLO-AG, ISLAND — gates can operate independently
-- **GCS Matrix**: Unified compliance structure with two temporal dimensions:
-  - *Violation History* (PRE-session): Historical compliance score gates session start
-  - *Integration State* (WITHIN-session): Runtime verification prevents context drift, truncation, and deflection
+- **GCS Matrix**: Unified compliance structure with two temporal dimensions
 - **AccessGate primitive**: Input validation with nested ToolInvocationGate
 - **Audit metrics API**: Structured metrics (blocks/day, rule coverage)
 - **Locale-aware PII**: Regional pattern configurations
 - **Adversarial test corpus**: Encoding attacks, prompt injection, tool exfiltration
 - **E2E benchmark**: p95 latency 78.6ms (NFR: <3000ms)
-
-**Test Coverage:** 673 tests passing • 67% code coverage • GCS 100
+</details>
 
 **Available now:** CLI (16 commands), REST API (8 endpoints), MCP server (3 tools), multi-provider LLM support.
 
@@ -150,7 +163,7 @@ Download the wheel for your platform from [GitHub Releases](https://github.com/j
 Then install:
 
 ```bash
-pip install agentkb-0.5.2-cp312-cp312-<your-platform>.whl
+pip install agentkb-0.5.3-cp312-cp312-<your-platform>.whl
 ```
 
 ### Quick Start
