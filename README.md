@@ -1,200 +1,154 @@
 # AgentKB
 
-**Governance-first knowledge infrastructure for AI agents.**
+**Governance enforcement for agentic workflows.**
+
+AgentKB is built for teams that need runtime boundaries across **access/input/tool/output**, deterministic policy decisions, and audit-grade traceability.
 
 ---
 
-## The Core Thesis
+## One-line Positioning
 
-> **AGENTS = PRINCIPALS**
-
-AI agents operating on enterprise data require the same governance controls as human employees:
-- **Access Control** — Who can see what
-- **Output Control** — What can be said externally
-- **Audit Trail** — Who did what, when
-
-Most AI security focuses only on access. AgentKB addresses all three.
+I’m building AgentKB: governance enforcement for agentic workflows (runtime boundaries across access/input/tool/output, deterministic policy decisions, and audit-grade traceability). We’ve focused on structural enforcement over prompt trust.
 
 ---
 
-## What AgentKB Does
+## Why AgentKB
 
-AgentKB provides governance infrastructure for AI agents:
+Most agentic systems can authenticate users and call models, but still struggle to **enforce** governance at runtime:
 
-1. **Access Control** — Scope what agents can read by role and sensitivity [Phase 3]
-2. **Output Gate** — Block PII, secrets, and unverifiable claims before disclosure [Available]
-3. **Audit Logging** — Every gate decision logged for compliance [Available]
-4. **Claim Validation** — Enforce evidence requirements for factual claims [Available]
+- What an agent is allowed to read
+- What an agent is allowed to disclose
+- What an agent is allowed to invoke
+- How every decision is explained and auditable
+
+AgentKB treats agents as principals and enforces policy through deterministic gates rather than relying on behavioral compliance.
 
 ---
 
-## Architecture: Two-Gate Model
+## Runtime Boundary Model
 
-```
-┌──────────────────────────────────────────────────────────┐
-│                    KNOWLEDGE BASE                         │
-│         (Content with sensitivity markers)                │
-└────────────────────┬─────────────────────────────────────┘
+```text
+┌───────────────────────────────────────────────────────────┐
+│                    GOVERNANCE POLICY                      │
+│        (roles, constraints, decision contracts)           │
+└────────────────────┬──────────────────────────────────────┘
                      │
                      ▼
-┌──────────────────────────────────────────────────────────┐
-│                 ACCESS GATE (Phase 3)                     │
-│   • Filters content BEFORE agent sees it                 │
-│   • RBAC: Role → Content scoping                         │
-│   • Prevents sensitive data reaching LLM provider        │
-└────────────────────┬─────────────────────────────────────┘
+┌───────────────────────────────────────────────────────────┐
+│ ACCESS / INPUT BOUNDARY                                  │
+│ • role/scope constraints                                  │
+│ • sensitivity-aware filtering                             │
+└────────────────────┬──────────────────────────────────────┘
                      │
                      ▼
                    AGENT
                      │
                      ▼
-┌──────────────────────────────────────────────────────────┐
-│                 OUTPUT GATE (Available)                   │
-│   • Scans agent outputs before disclosure                │
-│   • PII/secret detection, claim validation               │
-│   • Governance Compliance Score (GCS) enforcement        │
-└────────────────────┬─────────────────────────────────────┘
+┌───────────────────────────────────────────────────────────┐
+│ OUTPUT BOUNDARY                                           │
+│ • disclosure controls                                     │
+│ • PII/secret redaction/block semantics                    │
+└────────────────────┬──────────────────────────────────────┘
                      │
                      ▼
-                  OUTPUT
+┌───────────────────────────────────────────────────────────┐
+│ TOOL INVOCATION BOUNDARY                                  │
+│ • allow/deny by role + context                            │
+│ • outbound action governance                              │
+└────────────────────┬──────────────────────────────────────┘
+                     │
+                     ▼
+┌───────────────────────────────────────────────────────────┐
+│ AUDIT & ASSURANCE                                         │
+│ • decision lineage                                        │
+│ • reason codes + replay-ready traces                      │
+└───────────────────────────────────────────────────────────┘
 ```
 
-### Two-Gate Protection
+---
 
-**Input Side (Phase 3):** Access control filters content *before* it reaches the agent/LLM provider. Agents only see what their role permits.
+## What the Public Repository Includes
 
-**Output Side (Available):** Output gate validates agent responses before disclosure. Blocks PII, secrets, and unverifiable claims.
+Public release includes the high-level architecture and governance primitives for:
 
-Together: Defense-in-depth for enterprise AI.
+- Output governance
+- Access/input governance primitives
+- Audit and compliance telemetry
+- Operational hardening patterns
+
+For the public baseline, see:
+
+- [`ARCHITECTURE.md`](ARCHITECTURE.md)
+- [`ROADMAP.md`](ROADMAP.md)
+- [`API_REFERENCE.md`](API_REFERENCE.md)
+- [`MCP_INTEGRATION.md`](MCP_INTEGRATION.md)
+- [`USER_GUIDE.md`](USER_GUIDE.md)
+
+---
+
+## Current Status (Public View)
+
+### Public baseline
+- **Release line:** v0.5.x
+- **Coverage:** Phase 1 → Phase 2.9.5 public baseline
+- **Repository intent:** source-available evaluation and high-level technical reference
+
+### Private ongoing development
+Phases 3+ continue in private development, focused on enterprise readiness and broader ecosystem integration. Public docs are intentionally high level and non-proprietary.
+
+For public roadmap boundaries, see [`ROADMAP.md`](ROADMAP.md).
 
 ---
 
 ## Use Cases
 
-- **Enterprise AI Assistants** — Prevent confidential data leakage
-- **Multi-tenant Systems** — Scope agent knowledge by customer/role
-- **Compliance Environments** — Audit what agents accessed and disclosed
-- **Agentic Applications** — Governance middleware for LLM pipelines
+- Enterprise AI assistants with governance requirements
+- Multi-tenant agentic systems with scoped data access
+- Compliance-heavy environments requiring decision traceability
+- Teams needing structural controls beyond prompt-level guardrails
 
 ---
 
-## Framework Alignment & Compliance
+## Framework Alignment (High-Level)
 
-AgentKB governance primitives align with:
-- **NIST AI RMF 1.0** — Strong (3/4 functions)
-- **OWASP Agentic Top 10 (2026)** — Strong (8/10 categories)
-- **Therac-25 / Ariane 5 Benchmark** — Strong (4.7/5 categories)
-- **Gartner AI TRiSM** — Strong (3/5 pyramid layers)
-- **Proofpoint AI Security** — Strong (4/5 requirements)
+AgentKB governance primitives are designed to align with widely used enterprise governance and security frameworks, including:
 
-### Compliance Support
+- NIST AI RMF 1.0
+- OWASP Agentic Security Initiative (2026)
+- AI TRiSM-style governance and runtime control models
 
-| Standard | AgentKB Support |
-|----------|----------------|
-| **HIPAA** | PII detection, audit logging, sensitivity classification |
-| **SOX** | Immutable audit trail, role-based access, governance versioning |
-| **GDPR** | Data classification, output filtering, consent-aware scoping |
-
----
-
-## Current Status
-
-> ✅ **Phase 1-2.10.1 Public Release** (v0.5.3)
-
-| Phase | Focus | Status |
-|-------|-------|--------|
-| **Phase 1** | Output Gate MVP | ✅ Complete |
-| **Phase 2** | Audit + GCS + Evidence | ✅ Complete |
-| **Phase 2.5-2.7** | Structural Enforcement (3-tier detection, Audit Bus) | ✅ Complete |
-| **Phase 2.9** | Foundation Hardening (adversarial tests, locale patterns) | ✅ Complete |
-| **Phase 2.9.5** | Four Operational Modes (gate independence) | ✅ Complete |
-| **Phase 3** | Access Control (RBAC enforcement) | 🔒 Private |
-| **Phase 4** | Enterprise (IdP, SDKs, Dashboard) | 🔒 Private |
-
-> ⚠️ **Public Baseline:** This release is frozen at Phase 2.9.5. Phases 3+ continue in private development. See [ROADMAP.md](ROADMAP.md) for licensing details.
-
-### What's New in v0.5.3
-
-- **Audit Attribution Origin Field** (Phase 2.10): Every audit event now includes `context.origin` identifying the action source:
-  - `human_cli` — Human via CLI commands
-  - `agent_mcp` — Agent via MCP tools
-  - `system_http` — System via REST API
-  - Additional types: `human_http`, `agent_llm`, `system_cron`, `system_internal`
-- **Session Correlation** (Phase 2.10.1): `origin.session_id` now populated for attribution correlation:
-  - API: Uses existing session ID
-  - CLI: Generates ephemeral session ID per invocation
-  - MCP: Generates ephemeral session ID per tool call
-- **MCP Audit Logging**: MCP tools now log to audit trail (was missing in prior releases)
-
-**Test Coverage:** 671 tests passing • 67% code coverage • GCS 100
-
-<details>
-<summary>What was new in v0.5.2</summary>
-
-- **Four Operational Modes**: FULL, SOLO-OG, SOLO-AG, ISLAND — gates can operate independently
-- **GCS Matrix**: Unified compliance structure with two temporal dimensions
-- **AccessGate primitive**: Input validation with nested ToolInvocationGate
-- **Audit metrics API**: Structured metrics (blocks/day, rule coverage)
-- **Locale-aware PII**: Regional pattern configurations
-- **Adversarial test corpus**: Encoding attacks, prompt injection, tool exfiltration
-- **E2E benchmark**: p95 latency 78.6ms (NFR: <3000ms)
-</details>
-
-**Available now:** CLI (16 commands), REST API (8 endpoints), MCP server (3 tools), multi-provider LLM support.
+Detailed mapping is maintained in private governance artifacts and selectively exposed in public form where appropriate.
 
 ---
 
 ## Getting Started
 
-> 🚀 **New to AgentKB?** Start with the [Quick Start Guide](QUICKSTART.md) — get running in ~10 minutes with zero Python experience required.
->
-> 📖 Already comfortable with Python? Jump to the [User Guide](USER_GUIDE.md) for the full command reference.
+If you want a fast orientation:
 
-### Installation
+1. Read [`ARCHITECTURE.md`](ARCHITECTURE.md)
+2. Review [`DEMO_METHODOLOGY.md`](DEMO_METHODOLOGY.md)
+3. Use [`QUICKSTART.md`](QUICKSTART.md) for local setup
 
-Download the wheel for your platform from [GitHub Releases](https://github.com/j-w-code/AgentKB-public/releases):
+Wheel artifacts are published via GitHub Releases:
 
-| Platform | Filename |
-|----------|----------|
-| Windows | `agentkb-*-cp312-cp312-win_amd64.whl` |
-| Linux | `agentkb-*-cp312-cp312-manylinux*.whl` |
-| macOS | `agentkb-*-cp312-cp312-macosx*.whl` |
-
-Then install:
-
-```bash
-pip install agentkb-0.5.3-cp312-cp312-<your-platform>.whl
-```
-
-### Quick Start
-
-```bash
-agentkb init        # Initialize workspace
-agentkb doctor      # Verify setup
-agentkb gate --text "Hello world"  # Test output gate
-```
+`https://github.com/j-w-code/AgentKB-public/releases`
 
 ---
 
 ## License
 
-**Source-Available.** See [LICENSE](LICENSE) for details.
-
-- ✅ View, modify, run for development/testing
-- ✅ Evaluate before commitment
-- ❌ Production use requires commercial license
+Source-available. See [`LICENSE`](LICENSE) and [`NOTICE`](NOTICE).
 
 ---
 
 ## Contact
 
 **J.W.** — Founder  
-📧 agentkb_jw@proton.me  
-🐦 [@HSThurston](https://x.com/HSThurston) (Hermes Thurston — Creative Collaborator)
+📧 `agentkb_jw@proton.me`
 
-- Commercial licensing inquiries
-- Design partner opportunities
 - Technical feedback
+- Design partner conversations
+- Commercial licensing inquiries
 
 ---
 
