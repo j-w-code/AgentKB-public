@@ -178,6 +178,7 @@ Phase 4 (enterprise hardening, meta-governance, SDKs) is open. See [`ROADMAP.md`
 Architecture independently derived, then systematically validated against:
 - NIST AI RMF 1.0 (GOVERN, MAP, MEASURE)
 - OWASP Agentic Security Initiative 2026 (8.5/10 categories)
+- ISO/IEC 42001:2023 (AI management system governance alignment)
 - Gartner AI TRiSM (AI Governance + Runtime Enforcement)
 - DoD CMMC 2.13 (~65% applicable domains)
 - Therac-25 / Ariane 5 failure mode benchmark (4.7/5 categories)

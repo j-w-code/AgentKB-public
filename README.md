@@ -159,6 +159,7 @@ AgentKB governance primitives have been validated against:
 
 - **NIST AI RMF 1.0** — Strong (GOVERN, MAP, MEASURE)
 - **OWASP Agentic Security Initiative 2026** — Strong (8.5/10 categories)
+- **ISO/IEC 42001:2023** — Strong (AI management system governance alignment)
 - **Gartner AI TRiSM** — Strong (AI Governance + Runtime Enforcement)
 - **DoD CMMC 2.13** — Partial (~65% applicable domains; CM, CA, AU strong)
 - **Therac-25 / Ariane 5 Benchmark** — Strong (4.7/5 failure mode categories)
