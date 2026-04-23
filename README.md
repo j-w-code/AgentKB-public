@@ -4,6 +4,13 @@
 
 Runtime boundaries across access, input, tool invocation, and output. Deterministic policy decisions. Audit-grade traceability. Structural enforcement over prompt trust.
 
+## Status
+
+- **Public repo role** — public reference documentation plus an intentionally lagged evaluation baseline
+- **Public wheel baseline** — releases remain pegged to a lower `v0.5.x` phase-completion state by design
+- **Private development** — active private development continues beyond that public baseline
+- **Current private program state** — Phase 4 complete, Phase 5 open
+
 ---
 
 ## Core Thesis: Agents Are Principals
@@ -70,7 +77,9 @@ All gates operate independently. When one gate is unhealthy, the remaining gates
 
 ## What's Built
 
-Phases 1 through 3 are **complete**. The runtime includes:
+Public wheel artifacts remain intentionally held at an earlier `v0.5.x` baseline. The summary below describes the broader development program at a high level, not a claim that every item listed is available in the public wheel.
+
+The runtime program includes:
 
 ### Governance Gates
 - **Access Gate** — Content-layer RBAC with retrieval-time enforcement, sensitivity ceiling, claim type filtering
@@ -119,37 +128,29 @@ Phases 1 through 3 are **complete**. The runtime includes:
 
 ## Development Status
 
+The public wheel baseline remains intentionally lower/frozen while private development continues materially beyond it.
+
 | Phase | Status | Theme |
 |-------|--------|-------|
 | Phase 1 | **Complete** | Output Gate MVP — CLI, REST API, MCP, multi-provider LLM |
 | Phase 2 | **Complete** | GCS, audit foundation, evidence enforcement, context integrity |
 | Phase 2.5–2.9.5 | **Complete** | 3-tier detection, Audit Bus, four operational modes, adversarial corpus |
 | Phase 3 | **Complete** | Access control, closed-loop pipeline, agent identity, multi-tenant, tool gate, enterprise auth foundation |
-| Phase 4 | **Open** | Enterprise hardening, meta-governance, SDK ecosystem |
-| Phase 5 | Planned | Advanced security layer (detection, behavioral analytics, security operations) |
+| Phase 4 | **Complete (private development)** | Enterprise hardening, meta-governance, SDK ecosystem, context and operational controls |
+| Phase 5 | **Open (private development)** | Advanced security layer (detection, behavioral analytics, security operations) |
 | Phase 6 | Planned | Productization (enterprise UX, operational packaging, deployment tooling) |
 
 Development began December 31, 2025. Continuous development through present. Sole author: Jeffrey Wiley Jr.
 
 ---
 
-## What's Next (Phase 4+)
+## Development Beyond the Public Baseline
 
-Phase 4 is organized into execution waves:
+Private development has continued materially beyond the public `v0.5.x` baseline across enterprise hardening, meta-governance, SDK and integration surfaces, context hardening, and operational/compliance controls. The public repo is therefore not a line-by-line mirror of the current private runtime state; it exposes the architecture, roadmap, and evaluation baseline.
 
-**Enterprise Auth** — OAuth/OIDC federated identity provider integration, just-in-time privilege elevation with human approval, tamper-proof audit with cryptographic signing
+**Phase 5** continues to build an advanced security layer on top of the governance substrate: behavioral baselines, anomaly detection, adversarial prompt detection, agent incident response playbooks, and related detection/response controls.
 
-**Meta-Governance** — Rule lifecycle management (retire obsolete rules, consolidate overlapping rules), governance health analysis, operator safety interlocks for high-impact mutations, decision trace export for compliance evidence
-
-**SDK & Integration** — Python and JavaScript SDKs, inter-agent security primitives, cross-surface policy parity verification, zero-trust privileged-mutation cutover
-
-**Context Hardening** — User-defined scope locks, hash-based session drift detection, memory trust classification by source provenance
-
-**UX & Operations** — Usefulness optimization (governance-compliant AND helpful), exception workflow UX, progressive rule expansion, compliance framework alignment tooling (ISO 42001, CMMC)
-
-**Phase 5** builds an advanced security layer on top of the governance substrate: behavioral baselines, anomaly detection, adversarial prompt detection, agent incident response playbooks, air-gapped deployment support.
-
-**Phase 6** converts the runtime into an enterprise-deployable product: page-based operator UX, governance operations cockpit, deployment packaging, and procurement evidence bundles.
+**Phase 6** remains the productization track: page-based operator UX, governance operations surfaces, deployment packaging, and procurement evidence bundles.
 
 ---
 
@@ -192,6 +193,8 @@ For a fast orientation:
 Wheel artifacts are published via GitHub Releases:
 
 `https://github.com/j-w-code/AgentKB-public/releases`
+
+These releases reflect the intentionally lagged public evaluation baseline, not the full current private development state.
 
 Additional public documentation:
 

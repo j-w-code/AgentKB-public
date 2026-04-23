@@ -12,6 +12,8 @@
 
 **AgentKB approach:** Governance at the data layer, not the prompt layer. Structural enforcement over behavioral compliance.
 
+**Public documentation note:** This document describes the full conceptual architecture and current development direction. Public wheel releases are intentionally held at a lower `v0.5.x` baseline for evaluation; private development continues beyond that public release state.
+
 **Key distinction:** Governance ≠ Safety. Governance is structural and persistent (what can be accessed, disclosed, invoked). Safety is subjective and ethical (bias, harmful content). AgentKB provides governance; safety remains the concern of model providers. A properly implemented governance system actually *increases* what agents can permissibly do.
 
 ---
@@ -161,7 +163,9 @@ Vector databases optimize for retrieval speed; governance adds overhead they won
 
 ## Current Implementation
 
-Phases 1–3 are complete. The runtime includes:
+Private development has advanced through the core governance substrate and enterprise hardening layers. Public wheel artifacts remain intentionally held at a lower `v0.5.x` baseline and do not mirror every private-runtime capability. This section summarizes the broader implementation program at a high level.
+
+The runtime program includes:
 
 - **Three governance gates** — Access, Output, Tool Invocation (all with full parity across CLI/API/MCP)
 - **Agent identity foundation** — Authentication, registry, lifecycle, authority hierarchy
@@ -171,7 +175,7 @@ Phases 1–3 are complete. The runtime includes:
 - **Audit infrastructure** — Audit Bus, structured metrics, session fingerprinting, MCP caller verification
 - **Kubernetes deployment** — Transport, session store, and scaling configuration
 
-Phase 4 (enterprise hardening, meta-governance, SDKs) is open. See [`ROADMAP.md`](ROADMAP.md).
+Private development has advanced through Phase 4; Phase 5 is open. See [`ROADMAP.md`](ROADMAP.md) for the broader program view and the public-baseline distinction.
 
 ### Framework Alignment
 

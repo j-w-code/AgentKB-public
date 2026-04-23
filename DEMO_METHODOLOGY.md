@@ -104,17 +104,19 @@ The mock mode ensures reproducible demo flow. Real LLM testing confirmed the Out
 
 ## Current Access
 
-AgentKB Phase 1-2.9.5 is now **publicly available** as compiled wheels (public baseline, frozen).
+AgentKB is publicly available as an intentionally lagged compiled-wheel baseline via GitHub Releases.
+
+Public releases remain on a lower `v0.5.x` evaluation baseline while private development continues separately beyond that public state.
 
 Download the wheel for your platform from [GitHub Releases](https://github.com/j-w-code/AgentKB-public/releases):
 
 ```bash
-pip install agentkb-0.5.1-cp312-cp312-<your-platform>.whl
+pip install <downloaded-wheel-file>
 agentkb init
 agentkb doctor
 ```
 
-The commands demonstrated in the video work identically to what you'll experience.
+The commands demonstrated in the video reflect the public evaluation baseline experience within that released scope.
 
 ---
 
@@ -124,7 +126,7 @@ The commands demonstrated in the video work identically to what you'll experienc
 A: The demo runs actual AgentKB code. Mock mode provides deterministic output for clean recording, but real LLM integration was validated separately.
 
 **Q: Would this work on my machine?**  
-A: When publicly released, yes. The demo was specifically run on a fresh VM to validate this.
+A: For the released public baseline, yes. The demo was specifically run on a fresh VM to validate that experience.
 
 **Q: Is the Output Gate just prompt engineering?**  
 A: No. The gate operates at the output layer, after the LLM responds. It's enforcement, not suggestion.

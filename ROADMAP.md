@@ -1,12 +1,14 @@
 # AgentKB Roadmap
 
-> **Last updated:** March 2026
+> **Last updated:** April 2026
 
 ---
 
 ## Development Status
 
-**Current state:** Phase 1–3 complete. Phase 4 open.
+**Current private program state:** Phase 4 complete. Phase 5 open.
+**Public wheel baseline:** intentionally held at a lower `v0.5.x` phase-completion state for evaluation.
+**Public document role:** this roadmap reflects the broader program direction/state at a high level, not a 1:1 inventory of the public wheel.
 **Architecture:** Locked (Full System — access control + output governance + closed-loop)
 **Development span:** December 31, 2025 → present (continuous)
 **Sole author:** Jeffrey Wiley Jr.
@@ -76,9 +78,10 @@
 
 ---
 
-## Phase 4: Enterprise + Meta-Governance + SDK — 🔓 Open
-**Target:** Q3–Q4 2026
-**Theme:** Enterprise-ready with full rule lifecycle and SDK ecosystem
+## Phase 4: Enterprise + Meta-Governance + SDK — ✅ Complete in private development
+**Theme:** Enterprise hardening, full rule lifecycle, SDK ecosystem, context hardening, and operational controls
+
+Delivered privately while the public wheel baseline remained intentionally held back.
 
 ### Wave 4.1 — Enterprise Auth
 - OAuth/OIDC federated identity provider integration (Okta, Auth0, Azure AD, Keycloak)
@@ -119,7 +122,7 @@
 
 ---
 
-## Phase 5: Advanced Security Layer — Planned
+## Phase 5: Advanced Security Layer — 🔓 Open in private development
 **Theme:** Detection, behavioral analytics, and security operations built on the governance substrate
 
 - **Foundation:** Compliance reporting, data flow documentation, credential rotation, air-gapped deployment, access alerting
